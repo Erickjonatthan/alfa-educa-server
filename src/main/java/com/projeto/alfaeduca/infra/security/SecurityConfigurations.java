@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -23,16 +24,28 @@ public class SecurityConfigurations {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(req -> {
-                req.requestMatchers(HttpMethod.POST, "/login").permitAll();
-                req.requestMatchers(HttpMethod.POST, "/cadastro").permitAll();
-                req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
-                req.anyRequest().authenticated();
+        http
+                .cors().configurationSource(request -> {
+                    CorsConfiguration cors = new CorsConfiguration().applyPermitDefaultValues();
+                    cors.addAllowedMethod(HttpMethod.GET);
+                    cors.addAllowedMethod(HttpMethod.POST);
+                    cors.addAllowedMethod(HttpMethod.PUT);
+                    cors.addAllowedMethod(HttpMethod.DELETE);
+                    cors.addAllowedMethod(HttpMethod.PATCH);
+                    return cors;
                 })
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .and()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests(req -> {
+                    req.requestMatchers(HttpMethod.POST, "/cadastro").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/login").permitAll();
+                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    req.anyRequest().authenticated();
+                })
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
     @Bean

@@ -35,9 +35,6 @@ public class UserAccount implements UserDetails {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
-    private String apelido;
-
     @Column(nullable = false, unique = true)
     private String login;
 
@@ -55,7 +52,6 @@ public class UserAccount implements UserDetails {
         this.nome = user.nome();
         this.login = user.email();
         this.senha =  passwordEncoder.encode(user.senha());
-        this.apelido = user.apelido();
         this.imgUrl = user.imgUrl(); 
     }
 
@@ -69,8 +65,6 @@ public class UserAccount implements UserDetails {
             this.login = dados.email();
         if (dados.senha() != null)
             this.senha = passwordEncoder.encode(dados.senha());
-        if (dados.apelido() != null)
-            this.apelido = dados.apelido();
         if (dados.imgUrl() != null)
             this.imgUrl = dados.imgUrl();
         
