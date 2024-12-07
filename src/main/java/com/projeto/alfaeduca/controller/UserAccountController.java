@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.projeto.alfaeduca.config.EmailVerifier;
 import com.projeto.alfaeduca.usuario.UserAccount;
 import com.projeto.alfaeduca.usuario.UserDetailsData;
 import com.projeto.alfaeduca.usuario.UserRegistrationData;
@@ -23,7 +24,6 @@ import com.projeto.alfaeduca.usuario.email.EmailService;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-
 
 
 @RestController
@@ -39,14 +39,24 @@ public class UserAccountController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private EmailVerifier emailVerifier;
+
     @PostMapping
     @Transactional
     public ResponseEntity<UserDetailsData> cadastrar(@RequestBody @Valid UserRegistrationData dados, UriComponentsBuilder uriBuilder) {
         
+
+
         if(repository.existsByLogin(dados.email())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
+        
+        // Verifica se o email é válido:
+        if (!emailVerifier.verificaEmail(dados.email())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        
         var usuario = new UserAccount(dados,passwordEncoder);
         repository.save(usuario);
         var uri = uriBuilder.path("/cadastro/{id}").buildAndExpand(usuario.getId()).toUri();
@@ -59,7 +69,7 @@ public class UserAccountController {
     
     @PutMapping
     @Transactional
-    public ResponseEntity atualizar(@RequestBody @Valid UserUpdateData dados ){
+    public ResponseEntity<UserDetailsData> atualizar(@RequestBody @Valid UserUpdateData dados ){
         
         var usuario = repository.getReferenceById(dados.id());
         usuario.atualizarInformacoes(dados, passwordEncoder);
@@ -70,7 +80,7 @@ public class UserAccountController {
     
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity remover(@PathVariable Long id ) {
+    public ResponseEntity<HttpStatus> remover(@PathVariable Long id ) {
 
         var usuario = repository.getReferenceById(id);
         repository.delete(usuario);
