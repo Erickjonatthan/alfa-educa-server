@@ -12,8 +12,8 @@
 	<groupId>com.projeto</groupId>
 	<artifactId>alfaeduca</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Alfa Educa</name>
-	<description>API REST da aplicação Alfa Educa.</description>
+	<name>AlfaEduca</name>
+	<description>API REST da aplicação AlfaEduca.</description>
 	<url />
 	<licenses>
 		<license />
