@@ -41,6 +41,7 @@ public class SecurityConfigurations {
                 .authorizeRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/cadastro").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/login").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/login/recuperar-senha").permitAll();
                     req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
                     req.anyRequest().authenticated();
                 })

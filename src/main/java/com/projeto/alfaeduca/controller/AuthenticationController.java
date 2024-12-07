@@ -1,5 +1,5 @@
 
-package com.projeto.alfaeduca.usuario.authentication;
+package com.projeto.alfaeduca.controller;
 
 import java.util.Random;
 
@@ -18,6 +18,7 @@ import com.projeto.alfaeduca.infra.security.TokenService;
 import com.projeto.alfaeduca.usuario.UserAccount;
 import com.projeto.alfaeduca.usuario.UserRepository;
 import com.projeto.alfaeduca.usuario.UserUpdateData;
+import com.projeto.alfaeduca.usuario.authentication.AuthenticationData;
 import com.projeto.alfaeduca.usuario.email.EmailService;
 
 import jakarta.validation.Valid;
@@ -32,9 +33,6 @@ public class AuthenticationController {
 
     @Autowired
     private TokenService tokenService;
-
-    // @Autowired
-    // private EmailService emailService;
     
     @Autowired
     private PasswordEncoder passwordEncoder;

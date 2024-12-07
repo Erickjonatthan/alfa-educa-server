@@ -11,8 +11,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.projeto.alfaeduca.domain.ValidacaoException;
-
 import jakarta.persistence.EntityNotFoundException;
 
 
