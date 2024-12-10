@@ -47,8 +47,6 @@ public class UserAccountController {
     @Transactional
     public ResponseEntity<UserDetailsData> cadastrar(@RequestBody @Valid UserRegistrationData dados, UriComponentsBuilder uriBuilder) {
         
-
-
         if(repository.existsByLogin(dados.email())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

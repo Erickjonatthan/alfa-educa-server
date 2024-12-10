@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.alfaeduca.infra.security.DadosTokenJWT;
-import com.projeto.alfaeduca.infra.security.SecurityUtils;
 import com.projeto.alfaeduca.infra.security.TokenService;
 import com.projeto.alfaeduca.usuario.UserAccount;
 import com.projeto.alfaeduca.usuario.UserDetailsData;
@@ -63,10 +61,6 @@ public class AuthenticationController {
 
     @PostMapping("/recuperar-senha/{id}")
     public ResponseEntity<UserDetailsData> recuperarSenha(@PathVariable Long id) {
-        
-        if (!SecurityUtils.isUserAccessingOwnResource(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
         
         Optional<UserAccount> user = repository.findById(id);
 

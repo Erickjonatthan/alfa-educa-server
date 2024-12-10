@@ -6,11 +6,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -39,8 +42,10 @@ public class UserAccount implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
-    @Column(name = "img_url")
-    private String imgUrl;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "img_perfil", length = 100000)
+    private byte[] imgPerfil;
    
     public void setSenha(String senha, PasswordEncoder passwordEncoder) {
         this.senha = passwordEncoder.encode(senha);
@@ -50,22 +55,18 @@ public class UserAccount implements UserDetails {
         this.nome = user.nome();
         this.login = user.email();
         this.senha =  passwordEncoder.encode(user.senha());
-        this.imgUrl = user.imgUrl(); 
+        this.imgPerfil = user.imgPerfil(); 
     }
 
-   
-
     public void atualizarInformacoes(@Valid UserUpdateData dados, PasswordEncoder passwordEncoder) {
-        
         if (dados.nome() != null)
             this.nome = dados.nome();
         if (dados.email() != null)
             this.login = dados.email();
         if (dados.senha() != null)
             this.senha = passwordEncoder.encode(dados.senha());
-        if (dados.imgUrl() != null)
-            this.imgUrl = dados.imgUrl();
-        
+        if (dados.imgPerfil() != null)
+            this.imgPerfil = dados.imgPerfil();
     }
 
     @Override

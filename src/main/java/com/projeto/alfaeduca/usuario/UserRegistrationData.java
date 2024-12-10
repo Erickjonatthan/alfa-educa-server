@@ -17,7 +17,7 @@ public record UserRegistrationData(
     @NotBlank
     String senha,
     
-    String imgUrl    
+    byte[] imgPerfil    
        ) {
 
     
