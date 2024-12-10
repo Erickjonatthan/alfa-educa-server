@@ -55,7 +55,6 @@ public class UserAccount implements UserDetails {
         this.nome = user.nome();
         this.login = user.email();
         this.senha =  passwordEncoder.encode(user.senha());
-        this.imgPerfil = user.imgPerfil(); 
     }
 
     public void atualizarInformacoes(@Valid UserUpdateData dados, PasswordEncoder passwordEncoder) {

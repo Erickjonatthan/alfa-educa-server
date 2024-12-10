@@ -68,25 +68,23 @@ public class UserAccountController {
     
     @PutMapping
     @Transactional
-    public ResponseEntity<UserDetailsData> atualizar(@RequestBody @Valid UserUpdateData dados ){
-        
+    public ResponseEntity<UserDetailsData> atualizar(@RequestBody @Valid UserUpdateData dados) {
         if (!SecurityUtils.isUserAccessingOwnResource(dados.id())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
+    
         var usuario = repository.getReferenceById(dados.id());
-        boolean senhaAlterada = !passwordEncoder.matches(dados.senha(), usuario.getSenha());
-
+        boolean senhaAlterada = dados.senha() != null && !passwordEncoder.matches(dados.senha(), usuario.getSenha());
+    
         usuario.atualizarInformacoes(dados, passwordEncoder);
-
-        if(senhaAlterada) {
+    
+        if (senhaAlterada) {
             emailService.sendPasswordChangeEmail(usuario);
         }
-
-        return ResponseEntity.ok(new UserDetailsData(usuario));
-
-    }
     
+        return ResponseEntity.ok(new UserDetailsData(usuario));
+    }
+   
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<HttpStatus> remover(@PathVariable Long id ) {
