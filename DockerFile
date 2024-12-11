@@ -2,9 +2,11 @@ FROM ubuntu:latest AS build
 
 RUN apt-get update
 RUN apt-get install openjdk-17-jdk -y
+RUN apt-get install tesseract-ocr -y
+RUN apt-get install maven -y
+
 COPY . .
 
-RUN apt-get install maven -y
 RUN mvn clean install
 
 FROM openjdk:17-jdk-slim
@@ -13,5 +15,7 @@ EXPOSE 8080
 
 COPY --from=build /target/alfaeduca-0.0.1-SNAPSHOT.jar app.jar
 
+# Definir variável de ambiente para o caminho do tessdata
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
 
 ENTRYPOINT ["java","-jar","/app.jar"]

@@ -10,10 +10,18 @@ import net.sourceforge.tess4j.TesseractException;
 
 public class OCR {
     private ITesseract tesseract = new Tesseract();
-    
+
+    public OCR() {
+        String tessDataPath = System.getenv("TESSDATA_PREFIX");
+        if (tessDataPath != null) {
+            tesseract.setDatapath(tessDataPath);
+        } else {
+            // Caminho padrão caso a variável de ambiente não esteja definida
+            tesseract.setDatapath("C:\\Program Files\\Tesseract-OCR\\tessdata");
+        }
+    }
 
     public String extrairTexto(InputStream inputStream) throws TesseractException {
-        tesseract.setDatapath("C:\\Program Files\\Tesseract-OCR\\tessdata");
         BufferedImage image;
         try {
             image = ImageIO.read(inputStream);
