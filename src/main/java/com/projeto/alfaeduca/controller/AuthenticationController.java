@@ -52,17 +52,14 @@ public class AuthenticationController {
 
         var authentication = manager.authenticate(authenticationToken);
 
-        var tokenJWT = tokenService.gerarToken((UserAccount) authentication.getPrincipal());
+        var dadosTokenJWT = tokenService.gerarToken((UserAccount) authentication.getPrincipal());
 
-        var contaId = ((UserAccount) authentication.getPrincipal()).getId();
-
-        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT, contaId));
-
+        return ResponseEntity.ok(dadosTokenJWT);
     }
 
     @PostMapping("/recuperar-senha/{id}")
     public ResponseEntity<UserDetailsData> recuperarSenha(@PathVariable UUID id) {
-        
+
         Optional<UserAccount> user = repository.findById(id);
 
         if (user.isPresent()) {

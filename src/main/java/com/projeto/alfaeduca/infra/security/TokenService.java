@@ -19,14 +19,18 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    public String gerarToken(UserAccount usuario) {
+    public DadosTokenJWT gerarToken(UserAccount usuario) {
         try {
             var algoritmo = Algorithm.HMAC256(secret);
-            return JWT.create()
+            var dataCriacao = Instant.now();
+            var dataExpiracao = dataExpiracao();
+            var token = JWT.create()
                     .withIssuer("API Pgp")
                     .withSubject(usuario.getLogin())
-                    .withExpiresAt(dataExpiracao())
+                    .withIssuedAt(dataCriacao)
+                    .withExpiresAt(dataExpiracao)
                     .sign(algoritmo);
+            return new DadosTokenJWT(token, usuario.getId(), dataExpiracao, dataCriacao);
         } catch (JWTCreationException exception){
             throw new RuntimeException("erro ao gerar token jwt", exception);
         }
@@ -48,5 +52,4 @@ public class TokenService {
     private Instant dataExpiracao() {
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
-
 }
