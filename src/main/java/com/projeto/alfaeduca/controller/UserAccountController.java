@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.projeto.alfaeduca.infra.security.SecurityUtils;
 import com.projeto.alfaeduca.usuario.UserAccount;
 import com.projeto.alfaeduca.usuario.UserDetailsData;
 import com.projeto.alfaeduca.usuario.UserRegistrationData;
@@ -46,8 +47,6 @@ public class UserAccountController {
     @Transactional
     public ResponseEntity<UserDetailsData> cadastrar(@RequestBody @Valid UserRegistrationData dados, UriComponentsBuilder uriBuilder) {
         
-
-
         if(repository.existsByLogin(dados.email())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -69,20 +68,35 @@ public class UserAccountController {
     
     @PutMapping
     @Transactional
-    public ResponseEntity<UserDetailsData> atualizar(@RequestBody @Valid UserUpdateData dados ){
-        
-        var usuario = repository.getReferenceById(dados.id());
-        usuario.atualizarInformacoes(dados, passwordEncoder);
-        
-        return ResponseEntity.ok(new UserDetailsData(usuario));
-
-    }
+    public ResponseEntity<UserDetailsData> atualizar(@RequestBody @Valid UserUpdateData dados) {
+        if (!SecurityUtils.isUserAccessingOwnResource(dados.id())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     
+        var usuario = repository.getReferenceById(dados.id());
+        boolean senhaAlterada = dados.senha() != null && !passwordEncoder.matches(dados.senha(), usuario.getSenha());
+    
+        usuario.atualizarInformacoes(dados, passwordEncoder);
+    
+        if (senhaAlterada) {
+            emailService.sendPasswordChangeEmail(usuario);
+        }
+    
+        return ResponseEntity.ok(new UserDetailsData(usuario));
+    }
+   
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<HttpStatus> remover(@PathVariable Long id ) {
+        
+        if (!SecurityUtils.isUserAccessingOwnResource(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         var usuario = repository.getReferenceById(id);
+
+        emailService.sendAccountDeletionEmail(usuario);
+
         repository.delete(usuario);
 
         return ResponseEntity.noContent().build();
@@ -92,7 +106,13 @@ public class UserAccountController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDetailsData> detalhar(@PathVariable Long id  ){
         
+        if (!SecurityUtils.isUserAccessingOwnResource(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
          var usuario = repository.getReferenceById(id);
          return ResponseEntity.ok(new UserDetailsData(usuario));
     }
+
+    
 }

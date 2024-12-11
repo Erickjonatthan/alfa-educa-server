@@ -15,9 +15,7 @@ public record UserRegistrationData(
     String email,
 
     @NotBlank
-    String senha,
-    
-    String imgUrl    
+    String senha
        ) {
 
     

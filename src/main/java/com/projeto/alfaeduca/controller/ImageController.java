@@ -1,8 +1,9 @@
 package com.projeto.alfaeduca.controller;
 
-import java.io.File;
+import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,15 +23,19 @@ public class ImageController {
     private OCR ocr;
     
     @PostMapping
-    public ResponseEntity<String> extrairTexto(@RequestParam("file") MultipartFile foto) throws TesseractException{
-
-        File file = new File(foto.getOriginalFilename());
-        try {
-            foto.transferTo(file);
+    public ResponseEntity<String> extrairTexto(@RequestParam("file") MultipartFile foto) throws TesseractException {
+        if (foto.isEmpty()) {
+            return ResponseEntity.badRequest().body("Arquivo não enviado ou está vazio.");
+        }
+    
+        String textoExtraido;
+        try (InputStream inputStream = foto.getInputStream()) {
+            textoExtraido = ocr.extrairTexto(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao extrair texto do arquivo.");
         }
-
-        return ResponseEntity.ok().body(ocr.extrairTexto(file));
+    
+        return ResponseEntity.ok().body(textoExtraido);
     }
 }
