@@ -1,5 +1,7 @@
 package com.projeto.alfaeduca.controller;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,7 +89,7 @@ public class UserAccountController {
    
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<HttpStatus> remover(@PathVariable Long id ) {
+    public ResponseEntity<HttpStatus> remover(@PathVariable UUID id ) {
         
         if (!SecurityUtils.isUserAccessingOwnResource(id)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -104,7 +106,7 @@ public class UserAccountController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDetailsData> detalhar(@PathVariable Long id  ){
+    public ResponseEntity<UserDetailsData> detalhar(@PathVariable UUID id  ){
         
         if (!SecurityUtils.isUserAccessingOwnResource(id)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
