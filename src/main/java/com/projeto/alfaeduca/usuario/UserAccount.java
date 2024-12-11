@@ -44,9 +44,6 @@ public class UserAccount implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "img_perfil", length = 100000)
     private byte[] imgPerfil;
    
     public void setSenha(String senha, PasswordEncoder passwordEncoder) {
