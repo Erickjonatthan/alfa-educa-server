@@ -3,6 +3,7 @@ package com.projeto.alfaeduca.controller;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +61,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/recuperar-senha/{id}")
-    public ResponseEntity<UserDetailsData> recuperarSenha(@PathVariable Long id) {
+    public ResponseEntity<UserDetailsData> recuperarSenha(@PathVariable UUID id) {
         
         Optional<UserAccount> user = repository.findById(id);
 
