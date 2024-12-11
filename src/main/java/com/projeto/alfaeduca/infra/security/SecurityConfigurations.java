@@ -25,34 +25,29 @@ public class SecurityConfigurations {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Configuração CORS modernizada
-            .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
-                CorsConfiguration corsConfig = new CorsConfiguration().applyPermitDefaultValues();
-                corsConfig.addAllowedMethod(HttpMethod.GET);
-                corsConfig.addAllowedMethod(HttpMethod.POST);
-                corsConfig.addAllowedMethod(HttpMethod.PUT);
-                corsConfig.addAllowedMethod(HttpMethod.DELETE);
-                corsConfig.addAllowedMethod(HttpMethod.PATCH);
-                return corsConfig;
-            }))
-            // Desabilitar CSRF
-            .csrf(csrf -> csrf.disable())
-            // Gerenciamento de sessão
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // Configuração de autorizações
-            .authorizeHttpRequests(auth -> {
-                auth.requestMatchers(HttpMethod.POST, "/cadastro").permitAll();
-                auth.requestMatchers(HttpMethod.POST, "/login").permitAll();
-                auth.requestMatchers(HttpMethod.POST, "/login/recuperar-senha/**").permitAll();
-                auth.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
-                auth.anyRequest().authenticated();
-            })
-            // Adicionar filtro personalizado
-            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
-
+                .cors().configurationSource(request -> {
+                    CorsConfiguration cors = new CorsConfiguration().applyPermitDefaultValues();
+                    cors.addAllowedMethod(HttpMethod.GET);
+                    cors.addAllowedMethod(HttpMethod.POST);
+                    cors.addAllowedMethod(HttpMethod.PUT);
+                    cors.addAllowedMethod(HttpMethod.DELETE);
+                    cors.addAllowedMethod(HttpMethod.PATCH);
+                    return cors;
+                })
+                .and()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests(req -> {
+                    req.requestMatchers(HttpMethod.POST, "/cadastro").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/login").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/recuperar-senha/**").permitAll();
+                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    req.anyRequest().authenticated();
+                })
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
