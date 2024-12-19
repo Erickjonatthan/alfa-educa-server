@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.projeto.alfaeduca.usuario.UserAccount;
 
+
 @Component
 public class SecurityUtils {
 
@@ -16,7 +17,7 @@ public class SecurityUtils {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             var userDetails = (UserDetails) authentication.getPrincipal();
             var usuario = (UserAccount) userDetails;
-            return usuario.getId().equals(userId);
+            return usuario.isAdmin() || usuario.getId().equals(userId);
         }
         return false;
     }

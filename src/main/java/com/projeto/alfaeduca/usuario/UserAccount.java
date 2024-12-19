@@ -8,14 +8,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -45,15 +44,23 @@ public class UserAccount implements UserDetails {
     private String senha;
 
     private byte[] imgPerfil;
-   
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles;
+
     public void setSenha(String senha, PasswordEncoder passwordEncoder) {
         this.senha = passwordEncoder.encode(senha);
     }
 
-    public UserAccount(UserRegistrationData user, PasswordEncoder passwordEncoder) {
+    public UserAccount(UserRegistrationData user, PasswordEncoder passwordEncoder, List<String> adminEmails) {
         this.nome = user.nome();
         this.login = user.email();
-        this.senha =  passwordEncoder.encode(user.senha());
+        this.senha = passwordEncoder.encode(user.senha());
+        if (adminEmails.contains(user.email())) {
+            this.roles = List.of("ROLE_USER", "ROLE_ADMIN");
+        } else {
+            this.roles = List.of("ROLE_USER");
+        }
     }
 
     public void atualizarInformacoes(@Valid UserUpdateData dados, PasswordEncoder passwordEncoder) {
@@ -69,7 +76,9 @@ public class UserAccount implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     @Override
@@ -102,4 +111,7 @@ public class UserAccount implements UserDetails {
         return true;
     }
 
+    public boolean isAdmin() {
+        return roles.contains("ROLE_ADMIN");
+    }
 }

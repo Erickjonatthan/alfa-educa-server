@@ -1,8 +1,11 @@
 package com.projeto.alfaeduca.controller;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +31,6 @@ import com.projeto.alfaeduca.usuario.email.EmailVerifier;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
-
 @RestController
 @RequestMapping("/cadastro")
 public class UserAccountController {
@@ -45,6 +47,9 @@ public class UserAccountController {
     @Autowired
     private EmailVerifier emailVerifier;
 
+    @Value("${admin.emails}")
+    private String adminEmails;
+
     @PostMapping
     @Transactional
     public ResponseEntity<UserDetailsData> cadastrar(@RequestBody @Valid UserRegistrationData dados, UriComponentsBuilder uriBuilder) {
@@ -58,10 +63,10 @@ public class UserAccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         
-        var usuario = new UserAccount(dados,passwordEncoder);
+        List<String> adminEmailList = Arrays.asList(adminEmails.split(","));
+        var usuario = new UserAccount(dados, passwordEncoder, adminEmailList);
         repository.save(usuario);
         var uri = uriBuilder.path("/cadastro/{id}").buildAndExpand(usuario.getId()).toUri();
-
 
         emailService.sendWelcomeEmail(usuario);
 
