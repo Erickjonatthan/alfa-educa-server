@@ -34,7 +34,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/cadastro")
 public class UserAccountController {
-    
+
     @Autowired
     private UserRepository repository;
 
@@ -52,17 +52,18 @@ public class UserAccountController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<UserDetailsData> cadastrar(@RequestBody @Valid UserRegistrationData dados, UriComponentsBuilder uriBuilder) {
-        
-        if(repository.existsByLogin(dados.email())) {
+    public ResponseEntity<UserDetailsData> cadastrar(@RequestBody @Valid UserRegistrationData dados,
+            UriComponentsBuilder uriBuilder) {
+
+        if (repository.existsByLogin(dados.email())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        
+
         // Verifica se o email é válido:
         if (!emailVerifier.verificaEmail(dados.email())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        
+
         List<String> adminEmailList = Arrays.asList(adminEmails.split(","));
         var usuario = new UserAccount(dados, passwordEncoder, adminEmailList);
         repository.save(usuario);
@@ -72,30 +73,30 @@ public class UserAccountController {
 
         return ResponseEntity.created(uri).body(new UserDetailsData(usuario));
     }
-    
+
     @PutMapping
     @Transactional
     public ResponseEntity<UserDetailsData> atualizar(@RequestBody @Valid UserUpdateData dados) {
         if (!SecurityUtils.isUserAccessingOwnResource(dados.id())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-    
+
         var usuario = repository.getReferenceById(dados.id());
         boolean senhaAlterada = dados.senha() != null && !passwordEncoder.matches(dados.senha(), usuario.getSenha());
-    
+
         usuario.atualizarInformacoes(dados, passwordEncoder);
-    
+
         if (senhaAlterada) {
             emailService.sendPasswordChangeEmail(usuario);
         }
-    
+
         return ResponseEntity.ok(new UserDetailsData(usuario));
     }
-   
+
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<HttpStatus> remover(@PathVariable UUID id ) {
-        
+    public ResponseEntity<HttpStatus> remover(@PathVariable UUID id) {
+
         if (!SecurityUtils.isUserAccessingOwnResource(id)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -109,17 +110,29 @@ public class UserAccountController {
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/{id}")
-    public ResponseEntity<UserDetailsData> detalhar(@PathVariable UUID id  ){
-        
+    public ResponseEntity<UserDetailsData> detalhar(@PathVariable UUID id) {
+
         if (!SecurityUtils.isUserAccessingOwnResource(id)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-         var usuario = repository.getReferenceById(id);
-         return ResponseEntity.ok(new UserDetailsData(usuario));
+        var usuario = repository.getReferenceById(id);
+        return ResponseEntity.ok(new UserDetailsData(usuario));
     }
 
-    
+    @GetMapping
+    public ResponseEntity<List<UserDetailsData>> listarTodosUsuarios() {
+        var usuarioAutenticado = SecurityUtils.getAuthenticatedUser();
+        if (usuarioAutenticado == null || !usuarioAutenticado.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        var usuarios = repository.findAll();
+        var usuariosDetalhes = usuarios.stream()
+                .map(UserDetailsData::new)
+                .toList();
+        return ResponseEntity.ok(usuariosDetalhes);
+    }
+
 }

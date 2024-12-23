@@ -21,4 +21,12 @@ public class SecurityUtils {
         }
         return false;
     }
+
+    public static UserAccount getAuthenticatedUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            return (UserAccount) authentication.getPrincipal();
+        }
+        return null;
+    }
 }
