@@ -1,16 +1,12 @@
 
 package com.projeto.alfaeduca.controller;
 
-import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.projeto.alfaeduca.infra.security.DadosTokenJWT;
 import com.projeto.alfaeduca.infra.security.TokenService;
 import com.projeto.alfaeduca.usuario.UserAccount;
+import com.projeto.alfaeduca.usuario.UserDataForgotPassword;
 import com.projeto.alfaeduca.usuario.UserDetailsData;
 import com.projeto.alfaeduca.usuario.UserRepository;
 import com.projeto.alfaeduca.usuario.authentication.AuthenticationData;
@@ -57,26 +54,25 @@ public class AuthenticationController {
         return ResponseEntity.ok(dadosTokenJWT);
     }
 
-    @PostMapping("/recuperar-senha/{id}")
-    public ResponseEntity<UserDetailsData> recuperarSenha(@PathVariable UUID id) {
+    @PostMapping("/recuperar-senha")
+    public ResponseEntity<UserDetailsData> recuperarSenha(@RequestBody UserDataForgotPassword data) {
 
-        Optional<UserAccount> user = repository.findById(id);
-
-        if (user.isPresent()) {
-            UserAccount rawUser = user.get();
+        UserAccount user = repository.findByLogin(data.email());
+        if (user != null) {
             // Gere uma nova senha aleatória
             String novaSenha = generateRandomPassword();
-
-            emailService.sendResetPasswordEmail(rawUser, novaSenha);
-            rawUser.setSenha(novaSenha, passwordEncoder);
-            repository.save(rawUser);
-
-            return ResponseEntity.ok(new UserDetailsData(rawUser));
+    
+            emailService.sendResetPasswordEmail(user, novaSenha);
+            user.setSenha(novaSenha, passwordEncoder);
+            repository.save(user);
+    
+            return ResponseEntity.ok(new UserDetailsData(user));
         }
-
+    
         return ResponseEntity.notFound().build();
     }
-
+    
+    
     private String generateRandomPassword() {
         Random random = new Random();
         return String.valueOf(random.nextInt(1000000));
