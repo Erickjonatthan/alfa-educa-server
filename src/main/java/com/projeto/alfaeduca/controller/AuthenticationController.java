@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.projeto.alfaeduca.infra.security.DadosTokenJWT;
 import com.projeto.alfaeduca.infra.security.TokenService;
 import com.projeto.alfaeduca.usuario.UserAccount;
 import com.projeto.alfaeduca.usuario.UserDataForgotPassword;
-import com.projeto.alfaeduca.usuario.UserDetailsData;
 import com.projeto.alfaeduca.usuario.UserRepository;
+import com.projeto.alfaeduca.usuario.DTO.UserDetailsDTO;
+import com.projeto.alfaeduca.usuario.DTO.UserLoginDTO;
 import com.projeto.alfaeduca.usuario.authentication.AuthenticationData;
 import com.projeto.alfaeduca.usuario.email.EmailService;
 
@@ -43,19 +43,20 @@ public class AuthenticationController {
     private EmailService emailService;
 
     @PostMapping
-    public ResponseEntity<DadosTokenJWT> efetuarLogin(@RequestBody @Valid AuthenticationData dados) {
-
+    public ResponseEntity<UserLoginDTO> efetuarLogin(@RequestBody @Valid AuthenticationData dados) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
-
         var authentication = manager.authenticate(authenticationToken);
+        var userAccount = (UserAccount) authentication.getPrincipal();
+        var token = tokenService.gerarToken(userAccount);
+        var isAdmin = userAccount.isAdmin();
 
-        var dadosTokenJWT = tokenService.gerarToken((UserAccount) authentication.getPrincipal());
+        var userLoginData = new UserLoginDTO(userAccount.getNome(), userAccount.getLogin(), token, isAdmin);
 
-        return ResponseEntity.ok(dadosTokenJWT);
+        return ResponseEntity.ok(userLoginData);
     }
 
     @PostMapping("/recuperar-senha")
-    public ResponseEntity<UserDetailsData> recuperarSenha(@RequestBody UserDataForgotPassword data) {
+    public ResponseEntity<UserDetailsDTO> recuperarSenha(@RequestBody UserDataForgotPassword data) {
 
         UserAccount user = repository.findByLogin(data.email());
         if (user != null) {
@@ -66,7 +67,7 @@ public class AuthenticationController {
             user.setSenha(novaSenha, passwordEncoder);
             repository.save(user);
     
-            return ResponseEntity.ok(new UserDetailsData(user));
+            return ResponseEntity.ok(new UserDetailsDTO(user));
         }
     
         return ResponseEntity.notFound().build();

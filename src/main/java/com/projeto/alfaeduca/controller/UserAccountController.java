@@ -21,10 +21,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.projeto.alfaeduca.infra.security.SecurityUtils;
 import com.projeto.alfaeduca.usuario.UserAccount;
-import com.projeto.alfaeduca.usuario.UserDetailsData;
 import com.projeto.alfaeduca.usuario.UserRegistrationData;
 import com.projeto.alfaeduca.usuario.UserRepository;
 import com.projeto.alfaeduca.usuario.UserUpdateData;
+import com.projeto.alfaeduca.usuario.DTO.UserDetailsDTO;
 import com.projeto.alfaeduca.usuario.email.EmailService;
 import com.projeto.alfaeduca.usuario.email.EmailVerifier;
 
@@ -52,7 +52,7 @@ public class UserAccountController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<UserDetailsData> cadastrar(@RequestBody @Valid UserRegistrationData dados,
+    public ResponseEntity<UserDetailsDTO> cadastrar(@RequestBody @Valid UserRegistrationData dados,
             UriComponentsBuilder uriBuilder) {
 
         if (repository.existsByLogin(dados.email())) {
@@ -71,12 +71,12 @@ public class UserAccountController {
 
         emailService.sendWelcomeEmail(usuario);
 
-        return ResponseEntity.created(uri).body(new UserDetailsData(usuario));
+        return ResponseEntity.created(uri).body(new UserDetailsDTO(usuario));
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity<UserDetailsData> atualizar(@RequestBody @Valid UserUpdateData dados) {
+    public ResponseEntity<UserDetailsDTO> atualizar(@RequestBody @Valid UserUpdateData dados) {
         if (!SecurityUtils.isUserAccessingOwnResource(dados.id())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -90,7 +90,7 @@ public class UserAccountController {
             emailService.sendPasswordChangeEmail(usuario);
         }
 
-        return ResponseEntity.ok(new UserDetailsData(usuario));
+        return ResponseEntity.ok(new UserDetailsDTO(usuario));
     }
 
     @DeleteMapping("/{id}")
@@ -111,18 +111,18 @@ public class UserAccountController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDetailsData> detalhar(@PathVariable UUID id) {
+    public ResponseEntity<UserDetailsDTO> detalhar(@PathVariable UUID id) {
 
         if (!SecurityUtils.isUserAccessingOwnResource(id)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         var usuario = repository.getReferenceById(id);
-        return ResponseEntity.ok(new UserDetailsData(usuario));
+        return ResponseEntity.ok(new UserDetailsDTO(usuario));
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDetailsData>> listarTodosUsuarios() {
+    public ResponseEntity<List<UserDetailsDTO>> listarTodosUsuarios() {
         var usuarioAutenticado = SecurityUtils.getAuthenticatedUser();
         if (usuarioAutenticado == null || !usuarioAutenticado.isAdmin()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -130,7 +130,7 @@ public class UserAccountController {
 
         var usuarios = repository.findAll();
         var usuariosDetalhes = usuarios.stream()
-                .map(UserDetailsData::new)
+                .map(UserDetailsDTO::new)
                 .toList();
         return ResponseEntity.ok(usuariosDetalhes);
     }

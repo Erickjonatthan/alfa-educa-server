@@ -1,7 +1,7 @@
 package com.projeto.alfaeduca.controller;
 
 import java.io.InputStream;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.projeto.alfaeduca.config.OCR;
+import com.projeto.alfaeduca.imagem.SilabaUtils;
+import com.projeto.alfaeduca.imagem.DTO.ImagemDetailsDTO;
 
 import net.sourceforge.tess4j.TesseractException;
 
@@ -21,21 +22,29 @@ public class ImageController {
 
     @Autowired
     private OCR ocr;
-    
+
     @PostMapping
-    public ResponseEntity<String> extrairTexto(@RequestParam("file") MultipartFile foto) throws TesseractException {
+    public ResponseEntity<ImagemDetailsDTO> extrairTexto(@RequestParam("file") MultipartFile foto)
+            throws TesseractException {
         if (foto.isEmpty()) {
-            return ResponseEntity.badRequest().body("Arquivo não enviado ou está vazio.");
+            return ResponseEntity.badRequest().body(null);
         }
-    
+
         String textoExtraido;
         try (InputStream inputStream = foto.getInputStream()) {
             textoExtraido = ocr.extrairTexto(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao extrair texto do arquivo.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-    
-        return ResponseEntity.ok().body(textoExtraido);
+
+        // Remover completamente as quebras de linha do texto extraído
+        textoExtraido = textoExtraido.replace("\n", "").replace("\r", "");
+
+        List<String> silabas = SilabaUtils.separarSilabas(textoExtraido);
+        String textoSilabado = String.join("-", silabas);
+
+        ImagemDetailsDTO imagemDetailsDTO = new ImagemDetailsDTO(textoExtraido, textoSilabado);
+        return ResponseEntity.ok().body(imagemDetailsDTO);
     }
 }
