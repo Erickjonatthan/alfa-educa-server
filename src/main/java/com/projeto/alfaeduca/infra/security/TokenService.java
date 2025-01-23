@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Service
 public class TokenService {
@@ -22,15 +22,13 @@ public class TokenService {
     public DadosTokenJWT gerarToken(UserAccount usuario) {
         try {
             var algoritmo = Algorithm.HMAC256(secret);
-            var dataCriacao = Instant.now();
-            var dataExpiracao = dataExpiracao();
+            var dataCriacao = Instant.now().minusSeconds(3 * 3600);
             var token = JWT.create()
                     .withIssuer("API Pgp")
                     .withSubject(usuario.getLogin())
                     .withIssuedAt(dataCriacao)
-                    .withExpiresAt(dataExpiracao)
                     .sign(algoritmo);
-            return new DadosTokenJWT(token, usuario.getId(), dataExpiracao, dataCriacao);
+            return new DadosTokenJWT(token, usuario.getId(), dataCriacao);
         } catch (JWTCreationException exception){
             throw new RuntimeException("erro ao gerar token jwt", exception);
         }
@@ -47,9 +45,5 @@ public class TokenService {
         } catch (JWTVerificationException exception) {
             throw new RuntimeException("Token JWT inválido ou expirado!");
         }
-    }
-
-    private Instant dataExpiracao() {
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
 }
