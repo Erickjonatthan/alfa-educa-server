@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.projeto.alfaeduca.domain.usuario.UserAccount;
+import com.projeto.alfaeduca.domain.usuario.UserRegistrationData;
+import com.projeto.alfaeduca.domain.usuario.UserRepository;
+import com.projeto.alfaeduca.domain.usuario.UserUpdateData;
+import com.projeto.alfaeduca.domain.usuario.DTO.UserDetailsDTO;
+import com.projeto.alfaeduca.domain.usuario.email.EmailService;
+import com.projeto.alfaeduca.domain.usuario.email.EmailVerifier;
 import com.projeto.alfaeduca.infra.security.SecurityUtils;
-import com.projeto.alfaeduca.usuario.UserAccount;
-import com.projeto.alfaeduca.usuario.UserRegistrationData;
-import com.projeto.alfaeduca.usuario.UserRepository;
-import com.projeto.alfaeduca.usuario.UserUpdateData;
-import com.projeto.alfaeduca.usuario.DTO.UserDetailsDTO;
-import com.projeto.alfaeduca.usuario.email.EmailService;
-import com.projeto.alfaeduca.usuario.email.EmailVerifier;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

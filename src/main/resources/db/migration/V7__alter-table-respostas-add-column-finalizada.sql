@@ -1,0 +1,2 @@
+ALTER TABLE respostas 
+ADD COLUMN finalizada BOOLEAN DEFAULT FALSE;

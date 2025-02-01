@@ -1,4 +1,4 @@
-package com.projeto.alfaeduca.usuario;
+package com.projeto.alfaeduca.domain.usuario;
 
 import java.util.Collection;
 import java.util.List;
@@ -44,6 +44,10 @@ public class UserAccount implements UserDetails {
     private String senha;
 
     private byte[] imgPerfil;
+
+    private int nivel;
+
+    private int pontos;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
@@ -114,4 +118,21 @@ public class UserAccount implements UserDetails {
     public boolean isAdmin() {
         return roles.contains("ROLE_ADMIN");
     }
+
+    public void adicionarPontos(int pontos) {
+        this.pontos += pontos;
+        atualizarNivel();
+    }
+
+    private void atualizarNivel() {
+        int novoNivel = calcularNivel(this.pontos);
+        if (novoNivel > this.nivel) {
+            this.nivel = novoNivel;
+        }
+    }
+    
+    private int calcularNivel(int pontos) {
+        return pontos / 100;
+    }
+
 }

@@ -1,10 +1,10 @@
-package com.projeto.alfaeduca.usuario.email;
+package com.projeto.alfaeduca.domain.usuario.email;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import com.projeto.alfaeduca.usuario.UserAccount;
+import com.projeto.alfaeduca.domain.usuario.UserAccount;
 
 @Service
 public class EmailService {

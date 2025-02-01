@@ -1,4 +1,4 @@
-package com.projeto.alfaeduca.usuario.email;
+package com.projeto.alfaeduca.domain.usuario.email;
 
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;

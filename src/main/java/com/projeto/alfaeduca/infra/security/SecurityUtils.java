@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.projeto.alfaeduca.usuario.UserAccount;
+import com.projeto.alfaeduca.domain.usuario.UserAccount;
 
 
 @Component
