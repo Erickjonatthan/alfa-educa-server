@@ -19,4 +19,10 @@ ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
 # Instalar Tesseract no contêiner final
 RUN apt-get update && apt-get install -y tesseract-ocr libtesseract-dev
 
+# Adicionar Flyway CLI e executar flyway repair
+RUN apt-get install -y wget \
+    && wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/7.11.4/flyway-commandline-7.11.4-linux-x64.tar.gz | tar xvz \
+    && ln -s `pwd`/flyway-7.11.4/flyway /usr/local/bin \
+    && flyway repair
+
 ENTRYPOINT ["java","-jar","/app.jar"]
