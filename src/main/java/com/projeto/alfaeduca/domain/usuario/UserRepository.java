@@ -1,4 +1,4 @@
-package com.projeto.alfaeduca.usuario;
+package com.projeto.alfaeduca.domain.usuario;
 
 
 import java.util.UUID;

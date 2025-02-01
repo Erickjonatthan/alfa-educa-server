@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.alfaeduca.domain.usuario.UserAccount;
+import com.projeto.alfaeduca.domain.usuario.UserDataForgotPassword;
+import com.projeto.alfaeduca.domain.usuario.UserRepository;
+import com.projeto.alfaeduca.domain.usuario.DTO.UserDetailsDTO;
+import com.projeto.alfaeduca.domain.usuario.DTO.UserLoginDTO;
+import com.projeto.alfaeduca.domain.usuario.authentication.AuthenticationData;
+import com.projeto.alfaeduca.domain.usuario.email.EmailService;
 import com.projeto.alfaeduca.infra.security.TokenService;
-import com.projeto.alfaeduca.usuario.UserAccount;
-import com.projeto.alfaeduca.usuario.UserDataForgotPassword;
-import com.projeto.alfaeduca.usuario.UserRepository;
-import com.projeto.alfaeduca.usuario.DTO.UserDetailsDTO;
-import com.projeto.alfaeduca.usuario.DTO.UserLoginDTO;
-import com.projeto.alfaeduca.usuario.authentication.AuthenticationData;
-import com.projeto.alfaeduca.usuario.email.EmailService;
 
 import jakarta.validation.Valid;
 

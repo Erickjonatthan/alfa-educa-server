@@ -1,4 +1,4 @@
-package com.projeto.alfaeduca.usuario.DTO;
+package com.projeto.alfaeduca.domain.usuario.DTO;
 
 import com.projeto.alfaeduca.infra.security.DadosTokenJWT;
 

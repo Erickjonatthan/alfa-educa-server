@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-import com.projeto.alfaeduca.usuario.email.EmailVerifier;
+import com.projeto.alfaeduca.domain.usuario.email.EmailVerifier;
 
 @Configuration
 public class AppConfig {

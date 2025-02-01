@@ -1,4 +1,4 @@
-package com.projeto.alfaeduca.imagem;
+package com.projeto.alfaeduca.domain.imagem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
