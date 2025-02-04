@@ -38,6 +38,9 @@ public class Task {
     private String descricao;
 
     @Column(nullable = false)
+    private String subtitulo;
+
+    @Column(nullable = false)
     private int nivel;
 
     @Column(nullable = false)

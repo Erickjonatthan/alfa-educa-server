@@ -8,6 +8,9 @@ public record TaskRegistrationData(
     String titulo,
 
     @NotBlank
+    String subtitulo,
+
+    @NotBlank
     String descricao,
 
     @NotNull
