@@ -1,16 +1,18 @@
 package com.projeto.alfaeduca.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import com.projeto.alfaeduca.config.OCR;
 import com.projeto.alfaeduca.domain.imagem.SilabaUtils;
 import com.projeto.alfaeduca.domain.imagem.DTO.ImagemDetailsDTO;
@@ -24,15 +26,23 @@ public class ImageController {
     @Autowired
     private OCR ocr;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImagemDetailsDTO> extrairTexto(@RequestParam("file") MultipartFile foto)
+    @PostMapping
+    public ResponseEntity<ImagemDetailsDTO> extrairTexto(@RequestBody Map<String, String> payload)
             throws TesseractException {
-        if (foto.isEmpty()) {
+        String base64Image = payload.get("image");
+        if (base64Image == null || base64Image.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        byte[] imageBytes;
+        try {
+            imageBytes = Base64.getDecoder().decode(base64Image);
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }
 
         String textoExtraido;
-        try (InputStream inputStream = foto.getInputStream()) {
+        try (InputStream inputStream = new ByteArrayInputStream(imageBytes)) {
             textoExtraido = ocr.extrairTexto(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
