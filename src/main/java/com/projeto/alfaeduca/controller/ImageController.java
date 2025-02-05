@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,7 @@ public class ImageController {
     @Autowired
     private OCR ocr;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImagemDetailsDTO> extrairTexto(@RequestParam("file") MultipartFile foto)
             throws TesseractException {
         if (foto.isEmpty()) {
