@@ -19,5 +19,4 @@ ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
 # Instalar Tesseract no contêiner final
 RUN apt-get update && apt-get install -y tesseract-ocr libtesseract-dev
 
-# Definir o heap size da JVM
-ENTRYPOINT ["java", "-Xmx1024m", "-Xms512m", "-jar", "/app.jar"]
+ENTRYPOINT ["java","-jar","/app.jar"]
