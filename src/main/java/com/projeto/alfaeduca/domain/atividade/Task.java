@@ -58,6 +58,7 @@ public class Task {
 
     public Task(TaskRegistrationData taskRegistrationData) {
         this.titulo = taskRegistrationData.titulo();
+        this.subtitulo = taskRegistrationData.subtitulo();
         this.descricao = taskRegistrationData.descricao();
         this.nivel = taskRegistrationData.nivel();
         this.pontos = taskRegistrationData.pontos();
