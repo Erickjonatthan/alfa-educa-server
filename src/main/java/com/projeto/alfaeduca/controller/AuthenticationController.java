@@ -91,7 +91,6 @@ public class AuthenticationController {
             if (roles.contains("ROLE_ADMIN")) {
                 // Se o usuário é admin, remove a role de admin e mantém apenas a de usuário
                 roles.remove("ROLE_ADMIN");
-                roles.add("ROLE_USER");
             } else {
                 // Se o usuário é comum, adiciona a role de admin
                 roles.add("ROLE_ADMIN");
