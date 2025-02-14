@@ -79,20 +79,23 @@ public class AuthenticationController {
         return ResponseEntity.notFound().build();
     }
 
-        @PostMapping("/promover-admin/{id}")
-    public ResponseEntity<UserDetailsDTO> promoverAdmin(@PathVariable UUID id) {
+     @PostMapping("/mudar-role/{id}")
+    public ResponseEntity<UserDetailsDTO> mudarRole(@PathVariable UUID id) {
         var usuarioAutenticado = SecurityUtils.getAuthenticatedUser();
         if (usuarioAutenticado == null || !usuarioAutenticado.isAdmin()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         var usuario = repository.getReferenceById(id);
         if (usuario != null) {
-            if (usuario.getRoles().contains("ROLE_ADMIN")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(new UserDetailsDTO(usuario));
-            }
-            // cria uma nova lista mutável de roles e adiciona a role de admin
             var roles = new ArrayList<>(usuario.getRoles());
-            roles.add("ROLE_ADMIN");
+            if (roles.contains("ROLE_ADMIN")) {
+                // Se o usuário é admin, remove a role de admin e mantém apenas a de usuário
+                roles.remove("ROLE_ADMIN");
+                roles.add("ROLE_USER");
+            } else {
+                // Se o usuário é comum, adiciona a role de admin
+                roles.add("ROLE_ADMIN");
+            }
             usuario.setRoles(roles);
             repository.save(usuario);
     
@@ -101,7 +104,6 @@ public class AuthenticationController {
     
         return ResponseEntity.notFound().build();
     }
-    
     
     private String generateRandomPassword() {
         Random random = new Random();
