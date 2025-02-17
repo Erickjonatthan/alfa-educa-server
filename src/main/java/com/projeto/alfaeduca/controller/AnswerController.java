@@ -22,6 +22,8 @@ import com.projeto.alfaeduca.domain.resposta.AnswerRepository;
 import com.projeto.alfaeduca.domain.resposta.DTO.AnswerDetailsDTO;
 import com.projeto.alfaeduca.domain.usuario.UserAccount;
 import com.projeto.alfaeduca.domain.usuario.UserRepository;
+import com.projeto.alfaeduca.infra.security.SecurityUtils;
+
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
@@ -42,6 +44,10 @@ public class AnswerController {
     @Transactional
     public ResponseEntity<AnswerDetailsDTO> cadastrar(@RequestBody @Valid AnswerRegistrationData dados,
             UriComponentsBuilder uriBuilder) {
+
+        if (!SecurityUtils.isUserAccessingOwnResource(dados.usuarioId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         // Obtém o usuário a partir do repositório
         var usuario = userRepository.findById(dados.usuarioId())
@@ -81,6 +87,9 @@ public class AnswerController {
 
     @GetMapping("/usuario/respostas")
     public ResponseEntity<List<AnswerDetailsDTO>> listarRespostasUsuario(@AuthenticationPrincipal UserAccount usuario) {
+        if (!SecurityUtils.isUserAccessingOwnResource(usuario.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         var respostas = repository.findByUsuario(usuario);
         var respostasDTO = respostas.stream()
                 .map(AnswerDetailsDTO::new)

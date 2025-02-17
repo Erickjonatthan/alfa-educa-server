@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import com.projeto.alfaeduca.domain.conquista.DTO.AchievementDetailsDTO;
 import com.projeto.alfaeduca.domain.conquista.Achievement;
 import com.projeto.alfaeduca.domain.conquista.AchievementRegistrationData;
 import com.projeto.alfaeduca.domain.usuario.UserRepository;
+import com.projeto.alfaeduca.infra.security.SecurityUtils;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -37,6 +39,10 @@ public class AchievementController {
     @Transactional
     public ResponseEntity<AchievementDetailsDTO> cadastrar(@RequestBody @Valid AchievementRegistrationData dados,
             UriComponentsBuilder uriBuilder) {
+        var usuarioAutenticado = SecurityUtils.getAuthenticatedUser();
+        if (usuarioAutenticado == null || !usuarioAutenticado.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         var conquista = new Achievement(dados);
         repository.save(conquista);
         var uri = uriBuilder.path("/conquista/{id}").buildAndExpand(conquista.getId()).toUri();
@@ -47,7 +53,9 @@ public class AchievementController {
     @PostMapping("/adicionar-ao-usuario/{userId}/{achievementId}")
     @Transactional
     public ResponseEntity<?> adicionarConquistaAoUsuario(@PathVariable UUID userId, @PathVariable UUID achievementId) {
-
+        if (!SecurityUtils.isUserAccessingOwnResource(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         var usuario = userRepository.findById(userId);
         var conquista = repository.findById(achievementId);
 
@@ -65,6 +73,9 @@ public class AchievementController {
 
     @GetMapping("/usuario/{userId}")
     public ResponseEntity<List<AchievementDetailsDTO>> listarConquistasDoUsuario(@PathVariable UUID userId) {
+        if (!SecurityUtils.isUserAccessingOwnResource(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         var usuario = userRepository.findById(userId);
 
         if (usuario.isPresent()) {

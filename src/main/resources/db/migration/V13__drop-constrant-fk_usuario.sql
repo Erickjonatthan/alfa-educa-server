@@ -1,0 +1,1 @@
+ALTER TABLE respostas DROP CONSTRAINT fk_usuario;
