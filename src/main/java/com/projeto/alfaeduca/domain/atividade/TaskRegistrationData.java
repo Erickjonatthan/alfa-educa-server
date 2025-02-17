@@ -19,6 +19,9 @@ public record TaskRegistrationData(
     @NotNull
     int pontos,
 
+    @NotNull
+    String tipo,
+
     @NotBlank
     String respostaCorreta
 ) {

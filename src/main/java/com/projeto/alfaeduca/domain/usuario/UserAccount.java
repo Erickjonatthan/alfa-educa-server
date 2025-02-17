@@ -1,5 +1,6 @@
 package com.projeto.alfaeduca.domain.usuario;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -8,6 +9,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.projeto.alfaeduca.domain.conquista.Achievement;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -15,6 +20,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -48,6 +56,19 @@ public class UserAccount implements UserDetails {
     private int nivel;
 
     private int pontos;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "usuario_conquistas",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "conquista_id")
+    )
+    private List<Achievement> conquistas = new ArrayList<>();
+
+    public void addConquista(Achievement achievement) {
+        this.conquistas.add(achievement);
+        achievement.getUsuarios().add(this);
+    }
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;

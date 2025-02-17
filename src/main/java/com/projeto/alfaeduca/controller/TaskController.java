@@ -1,12 +1,15 @@
 package com.projeto.alfaeduca.controller;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,5 +53,17 @@ public class TaskController {
     public ResponseEntity<List<TaskDetailsDTO>> listar() {
         var atividades = repository.findAll();
         return ResponseEntity.ok(atividades.stream().map(TaskDetailsDTO::new).collect(Collectors.toList()));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> deletar(@PathVariable UUID id) {
+        var usuarioAutenticado = SecurityUtils.getAuthenticatedUser();
+        if (usuarioAutenticado == null || !usuarioAutenticado.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        repository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

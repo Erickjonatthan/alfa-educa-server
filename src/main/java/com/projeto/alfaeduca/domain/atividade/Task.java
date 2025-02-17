@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.projeto.alfaeduca.domain.resposta.Answer;
+import com.projeto.alfaeduca.domain.usuario.UserAccount;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -52,6 +53,14 @@ public class Task {
     @OneToMany(mappedBy = "atividade", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Answer> respostas;
 
+    @Column( nullable = false)
+    private String tipo;
+
+
+    public int getQuantidadeRespostasEnviadas(UserAccount usuario) {
+        return (int) respostas.stream().filter(resposta -> resposta.getUsuario().equals(usuario)).count();
+    }
+
     public boolean verificarResposta(String respostaUsuario) {
         return this.respostaCorreta.equals(respostaUsuario);
     }
@@ -63,5 +72,6 @@ public class Task {
         this.nivel = taskRegistrationData.nivel();
         this.pontos = taskRegistrationData.pontos();
         this.respostaCorreta = taskRegistrationData.respostaCorreta();
+        this.tipo = taskRegistrationData.tipo();
     }
 }
