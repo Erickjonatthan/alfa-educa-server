@@ -88,4 +88,17 @@ public class AchievementController {
 
         return ResponseEntity.notFound().build();
     }
+
+    //listar todas as conquistas cadastradas
+    @GetMapping
+    public ResponseEntity<List<AchievementDetailsDTO>> listar() {
+        if (!SecurityUtils.getAuthenticatedUser().isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        var conquistas = repository.findAll();
+        var conquistasDTO = conquistas.stream()
+                .map(AchievementDetailsDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(conquistasDTO);
+    }
 }
