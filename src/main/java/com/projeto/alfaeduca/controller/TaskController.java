@@ -55,6 +55,17 @@ public class TaskController {
         return ResponseEntity.ok(atividades.stream().map(TaskDetailsDTO::new).collect(Collectors.toList()));
     }
 
+    //Listar atividade pelo id
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskDetailsDTO> detalhar(@PathVariable UUID id) {
+        var atividade = repository.findById(id);
+        if (atividade.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(new TaskDetailsDTO(atividade.get()));
+    }
+
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> deletar(@PathVariable UUID id) {
