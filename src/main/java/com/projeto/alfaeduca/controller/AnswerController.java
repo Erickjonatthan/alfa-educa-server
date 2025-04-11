@@ -75,6 +75,15 @@ public class AnswerController {
                 pontos *= 0.9; // Diminui 10% dos pontos
             }
             usuario.adicionarPontos(pontos);
+
+            // Incrementa o número de atividades concluídas
+            usuario.incrementarAtividadesConcluidas();
+
+            // Marca que o usuário acertou na primeira tentativa
+            if (respostasExistentes.isEmpty()) {
+                usuario.registrarPrimeiraRespostaCorreta();
+            }
+
             userRepository.save(usuario);
             resposta.setFinalizada(true);
             repository.save(resposta); // Salva a entidade resposta após modificar

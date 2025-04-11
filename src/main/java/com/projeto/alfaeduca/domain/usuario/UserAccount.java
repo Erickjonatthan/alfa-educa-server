@@ -1,5 +1,6 @@
 package com.projeto.alfaeduca.domain.usuario;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -57,6 +58,14 @@ public class UserAccount implements UserDetails {
 
     private int pontos;
 
+    private LocalDate ultimoLogin; // Para rastrear o último login
+
+    private int atividadesConcluidas;
+
+    private int diasConsecutivos;
+
+    private boolean primeiraRespostaCorreta;
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "usuario_conquistas",
@@ -66,8 +75,10 @@ public class UserAccount implements UserDetails {
     private List<Achievement> conquistas = new ArrayList<>();
 
     public void addConquista(Achievement achievement) {
-        this.conquistas.add(achievement);
-        achievement.getUsuarios().add(this);
+        if (!this.conquistas.contains(achievement)) {
+            this.conquistas.add(achievement);
+            achievement.getUsuarios().add(this);
+        }
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -154,6 +165,18 @@ public class UserAccount implements UserDetails {
     
     private int calcularNivel(int pontos) {
         return pontos / 100;
+    }
+
+    public void incrementarAtividadesConcluidas() {
+        this.atividadesConcluidas++;
+    }
+
+    public void incrementarDiasConsecutivos() {
+        this.diasConsecutivos++;
+    }
+
+    public void registrarPrimeiraRespostaCorreta() {
+        this.primeiraRespostaCorreta = true;
     }
 
 }

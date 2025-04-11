@@ -19,6 +19,8 @@ public class OCR {
             // Caminho padrão caso a variável de ambiente não esteja definida
             tesseract.setDatapath("C:\\Program Files\\Tesseract-OCR\\tessdata");
         }
+        // Define a linguagem para português
+        tesseract.setLanguage("por");
     }
 
     public String extrairTexto(InputStream inputStream) throws TesseractException {

@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.projeto.alfaeduca.domain.conquista.AchievementRepository;
 import com.projeto.alfaeduca.domain.conquista.DTO.AchievementDetailsDTO;
+import com.projeto.alfaeduca.domain.conquista.DTO.AchievementProgressDTO;
 import com.projeto.alfaeduca.domain.conquista.Achievement;
 import com.projeto.alfaeduca.domain.conquista.AchievementRegistrationData;
 import com.projeto.alfaeduca.domain.usuario.UserRepository;
@@ -35,6 +36,7 @@ public class AchievementController {
     @Autowired
     private UserRepository userRepository;
 
+    // Cadastrar uma nova conquista
     @PostMapping
     @Transactional
     public ResponseEntity<AchievementDetailsDTO> cadastrar(@RequestBody @Valid AchievementRegistrationData dados,
@@ -50,55 +52,91 @@ public class AchievementController {
         return ResponseEntity.created(uri).body(new AchievementDetailsDTO(conquista));
     }
 
-    @PostMapping("/adicionar-ao-usuario/{userId}/{achievementId}")
-    @Transactional
-    public ResponseEntity<?> adicionarConquistaAoUsuario(@PathVariable UUID userId, @PathVariable UUID achievementId) {
-        if (!SecurityUtils.isUserAccessingOwnResource(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        var usuario = userRepository.findById(userId);
-        var conquista = repository.findById(achievementId);
-
-        if (usuario.isPresent() && conquista.isPresent()) {
-            var user = usuario.get();
-            var achievement = conquista.get();
-            user.addConquista(achievement);
-            userRepository.save(user);
-
-            return ResponseEntity.ok().build();
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/usuario/{userId}")
-    public ResponseEntity<List<AchievementDetailsDTO>> listarConquistasDoUsuario(@PathVariable UUID userId) {
-        if (!SecurityUtils.isUserAccessingOwnResource(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        var usuario = userRepository.findById(userId);
-
-        if (usuario.isPresent()) {
-            var conquistas = usuario.get().getConquistas();
-            var conquistasDTO = conquistas.stream()
-                    .map(AchievementDetailsDTO::new)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(conquistasDTO);
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
-    //listar todas as conquistas cadastradas
+    // Listar todas as conquistas cadastradas
     @GetMapping
     public ResponseEntity<List<AchievementDetailsDTO>> listar() {
-        if (!SecurityUtils.getAuthenticatedUser().isAdmin()) {
+        var usuarioAutenticado = SecurityUtils.getAuthenticatedUser();
+        if (usuarioAutenticado == null || !usuarioAutenticado.isAdmin()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
         var conquistas = repository.findAll();
         var conquistasDTO = conquistas.stream()
                 .map(AchievementDetailsDTO::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(conquistasDTO);
+    }
+
+    // Verificar conquistas pendentes para um usuário
+    @GetMapping("/verificar/{userId}")
+    public ResponseEntity<List<AchievementProgressDTO>> verificarConquistasPendentes(@PathVariable UUID userId) {
+        if (!SecurityUtils.isUserAccessingOwnResource(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        var usuario = userRepository.findById(userId);
+        if (usuario.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var user = usuario.get();
+        var conquistas = repository.findAll();
+
+        // Filtrar conquistas pendentes e calcular progresso
+        var conquistasPendentes = conquistas.stream()
+                .filter(conquista -> !conquista.podeSerDesbloqueadaPor(user)) // Apenas as que não podem ser desbloqueadas
+                .map(conquista -> {
+                    return new AchievementProgressDTO(
+                            new AchievementDetailsDTO(conquista), // Detalhes da conquista
+                            conquista.calcularProgresso(user)    // Progresso do usuário
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(conquistasPendentes);
+    }
+
+    // Desbloquear conquistas automaticamente para um usuário
+    @PostMapping("/desbloquear/{userId}")
+    @Transactional
+    public ResponseEntity<?> desbloquearConquistas(@PathVariable UUID userId) {
+        if (!SecurityUtils.isUserAccessingOwnResource(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        var usuario = userRepository.findById(userId);
+        if (usuario.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var user = usuario.get();
+        var conquistasDesbloqueaveis = repository.findAll().stream()
+                .filter(conquista -> conquista.podeSerDesbloqueadaPor(user))
+                .collect(Collectors.toList());
+
+        conquistasDesbloqueaveis.forEach(user::addConquista);
+        userRepository.save(user);
+
+        return ResponseEntity.ok().build();
+    }
+
+    //listar as conquistas desbloqueadas de um usuário
+    @GetMapping("/listar/{userId}")
+    public ResponseEntity<List<AchievementDetailsDTO>> listarConquistasDesbloqueadas(@PathVariable UUID userId) {
+        if (!SecurityUtils.isUserAccessingOwnResource(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        var usuario = userRepository.findById(userId);
+        if (usuario.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var user = usuario.get();
+        var conquistasDesbloqueadas = user.getConquistas().stream()
+                .map(AchievementDetailsDTO::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(conquistasDesbloqueadas);
     }
 }

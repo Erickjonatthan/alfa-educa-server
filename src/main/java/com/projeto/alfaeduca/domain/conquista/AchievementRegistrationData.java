@@ -10,7 +10,16 @@ public record AchievementRegistrationData(
     @NotBlank
     String descricao,
 
-    byte[] imgConquista
+    byte[] imgConquista,
+
+    Integer nivelRequerido,
+
+    Integer pontosRequeridos,
+
+    Integer atividadesRequeridas,
+
+    Boolean primeiraRespostaCorreta,
+
+    Integer diasConsecutivosRequeridos
 ) {
-    
 }

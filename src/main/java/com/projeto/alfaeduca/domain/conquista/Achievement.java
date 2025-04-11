@@ -43,9 +43,68 @@ public class Achievement {
     @ManyToMany(mappedBy = "conquistas", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<UserAccount> usuarios = new ArrayList<>();
 
+    @Column(nullable = true)
+    private Integer nivelRequerido;
+
+    @Column(nullable = true)
+    private Integer pontosRequeridos;
+
+    @Column(nullable = true)
+    private Integer atividadesRequeridas;
+
+    @Column(nullable = true)
+    private Boolean primeiraRespostaCorreta;
+
+    @Column(nullable = true)
+    private Integer diasConsecutivosRequeridos;
+
     public Achievement(AchievementRegistrationData achievementRegistrationData) {
         this.titulo = achievementRegistrationData.titulo();
         this.descricao = achievementRegistrationData.descricao();
         this.imgConquista = achievementRegistrationData.imgConquista();
+        this.nivelRequerido = achievementRegistrationData.nivelRequerido();
+        this.pontosRequeridos = achievementRegistrationData.pontosRequeridos();
+        this.atividadesRequeridas = achievementRegistrationData.atividadesRequeridas();
+        this.primeiraRespostaCorreta = achievementRegistrationData.primeiraRespostaCorreta();
+        this.diasConsecutivosRequeridos = achievementRegistrationData.diasConsecutivosRequeridos();
+    }
+
+    // Método para verificar se a conquista pode ser desbloqueada por um usuário
+    public boolean podeSerDesbloqueadaPor(UserAccount user) {
+        if (this.nivelRequerido != null && user.getNivel() >= this.nivelRequerido) {
+            return true;
+        }
+        if (this.pontosRequeridos != null && user.getPontos() >= this.pontosRequeridos) {
+            return true;
+        }
+        if (this.atividadesRequeridas != null && user.getAtividadesConcluidas() >= this.atividadesRequeridas) {
+            return true;
+        }
+        if (this.primeiraRespostaCorreta != null && this.primeiraRespostaCorreta && user.isPrimeiraRespostaCorreta()) {
+            return true;
+        }
+        if (this.diasConsecutivosRequeridos != null && user.getDiasConsecutivos() >= this.diasConsecutivosRequeridos) {
+            return true;
+        }
+        return false;
+    }
+
+    public String calcularProgresso(UserAccount user) {
+        if (this.nivelRequerido != null && user.getNivel() < this.nivelRequerido) {
+            return "Faltam " + (this.nivelRequerido - user.getNivel()) + " níveis para desbloquear.";
+        }
+        if (this.pontosRequeridos != null && user.getPontos() < this.pontosRequeridos) {
+            return "Faltam " + (this.pontosRequeridos - user.getPontos()) + " pontos para desbloquear.";
+        }
+        if (this.atividadesRequeridas != null && user.getAtividadesConcluidas() < this.atividadesRequeridas) {
+            return "Faltam " + (this.atividadesRequeridas - user.getAtividadesConcluidas()) + " atividades para desbloquear.";
+        }
+        if (this.primeiraRespostaCorreta != null && this.primeiraRespostaCorreta && !user.isPrimeiraRespostaCorreta()) {
+            return "Você precisa acertar uma resposta na primeira tentativa.";
+        }
+        if (this.diasConsecutivosRequeridos != null && user.getDiasConsecutivos() < this.diasConsecutivosRequeridos) {
+            return "Faltam " + (this.diasConsecutivosRequeridos - user.getDiasConsecutivos()) + " dias consecutivos de login para desbloquear.";
+        }
+        return "Conquista desbloqueada ou sem progresso necessário.";
     }
 }

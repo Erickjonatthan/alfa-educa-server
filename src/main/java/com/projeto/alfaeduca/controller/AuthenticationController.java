@@ -1,6 +1,6 @@
-
 package com.projeto.alfaeduca.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
@@ -55,6 +55,19 @@ public class AuthenticationController {
         var userAccount = (UserAccount) authentication.getPrincipal();
         var token = tokenService.gerarToken(userAccount);
         var isAdmin = userAccount.isAdmin();
+
+        // Registrar login e atualizar dias consecutivos
+        LocalDate ultimoLogin = userAccount.getUltimoLogin();
+        LocalDate hoje = LocalDate.now();
+
+        if (ultimoLogin != null && ultimoLogin.plusDays(1).isEqual(hoje)) {
+            userAccount.incrementarDiasConsecutivos();
+        } else if (ultimoLogin == null || !ultimoLogin.isEqual(hoje)) {
+            userAccount.setDiasConsecutivos(1); // Reinicia a contagem
+        }
+
+        userAccount.setUltimoLogin(hoje);
+        repository.save(userAccount);
 
         var userLoginData = new UserLoginDTO(userAccount.getNome(), userAccount.getLogin(), token, isAdmin);
 
