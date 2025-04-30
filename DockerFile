@@ -9,14 +9,13 @@ RUN mvn clean install
 
 FROM openjdk:17-jdk-slim
 
-EXPOSE 8080 
+WORKDIR /app
+
+EXPOSE 8081
 
 COPY --from=build /target/alfaeduca-0.0.1-SNAPSHOT.jar app.jar
+COPY .env .env
 
-# Definir variável de ambiente para o caminho do tessdata
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
-
-# Instalar Tesseract no contêiner final
 RUN apt-get update && apt-get install -y tesseract-ocr libtesseract-dev
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]

@@ -2,6 +2,9 @@ package com.projeto.alfaeduca.config;
 
 import java.io.InputStream;
 import javax.imageio.ImageIO;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.awt.image.BufferedImage;
 
 import net.sourceforge.tess4j.ITesseract;
@@ -12,7 +15,8 @@ public class OCR {
     private ITesseract tesseract = new Tesseract();
 
     public OCR() {
-        String tessDataPath = System.getenv("TESSDATA_PREFIX");
+        Dotenv dotenv = Dotenv.configure().load();
+        String tessDataPath = dotenv.get("TESSDATA_PREFIX");
         if (tessDataPath != null) {
             tesseract.setDatapath(tessDataPath);
         } else {

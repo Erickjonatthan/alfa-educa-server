@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   postgres_alfaeduca:
@@ -7,6 +6,21 @@ services:
     ports:
       - "5434:5432"
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRES_DB=pg_alfaeduca
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  alfaeduca_app:
+    container_name: alfaeduca_app
+    build:
+      context: .
+      dockerfile: DockerFile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres_alfaeduca
+
+volumes:
+  postgres_data:

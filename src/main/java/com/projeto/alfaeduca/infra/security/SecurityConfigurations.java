@@ -1,5 +1,7 @@
 package com.projeto.alfaeduca.infra.security;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,14 +29,13 @@ public class SecurityConfigurations {
         http
             // Configuração CORS modernizada
             .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
-                CorsConfiguration corsConfig = new CorsConfiguration().applyPermitDefaultValues();
-                corsConfig.addAllowedMethod(HttpMethod.GET);
-                corsConfig.addAllowedMethod(HttpMethod.POST);
-                corsConfig.addAllowedMethod(HttpMethod.PUT);
-                corsConfig.addAllowedMethod(HttpMethod.DELETE);
-                corsConfig.addAllowedMethod(HttpMethod.PATCH);
+                CorsConfiguration corsConfig = new CorsConfiguration();
+                corsConfig.setAllowedOrigins(List.of("https://alfa-educa-web.onrender.com")); // Frontend autorizado
+                corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH")); // Métodos aceitos
+                corsConfig.setAllowedHeaders(List.of("*")); // Cabeçalhos aceitos
+                corsConfig.setAllowCredentials(true); // Permitir cookies/autenticação
                 return corsConfig;
-            }))
+            }))            
             // Desabilitar CSRF
             .csrf(csrf -> csrf.disable())
             // Gerenciamento de sessão
