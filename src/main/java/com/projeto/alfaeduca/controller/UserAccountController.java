@@ -24,6 +24,8 @@ import com.projeto.alfaeduca.domain.usuario.UserRegistrationData;
 import com.projeto.alfaeduca.domain.usuario.UserRepository;
 import com.projeto.alfaeduca.domain.usuario.UserUpdateData;
 import com.projeto.alfaeduca.domain.usuario.DTO.UserDetailsDTO;
+import com.projeto.alfaeduca.domain.task.Task;
+import com.projeto.alfaeduca.domain.task.TaskRepository;
 import com.projeto.alfaeduca.domain.usuario.email.EmailService;
 import com.projeto.alfaeduca.domain.usuario.email.EmailVerifier;
 import com.projeto.alfaeduca.infra.security.SecurityUtils;
@@ -50,6 +52,9 @@ public class UserAccountController {
     @Value("${admin.emails}")
     private String adminEmails;
 
+    @Autowired
+    private TaskRepository taskRepository;
+
     @PostMapping
     @Transactional
     public ResponseEntity<UserDetailsDTO> cadastrar(@RequestBody @Valid UserRegistrationData dados,
@@ -68,6 +73,17 @@ public class UserAccountController {
         var usuario = new UserAccount(dados, passwordEncoder, adminEmailList);
         repository.save(usuario);
         var uri = uriBuilder.path("/cadastro/{id}").buildAndExpand(usuario.getId()).toUri();
+
+        // Create and save a new Task
+        Task newTask = new Task();
+        newTask.setTipo("CALIGRAFIA");
+        newTask.setDescricao(usuario.getNome());
+        newTask.setTitulo("Caligrafia inicial para " + usuario.getNome());
+        newTask.setSubtitulo("Exercício de caligrafia");
+        newTask.setNivel(1);
+        newTask.setPontos(10);
+        newTask.setRespostaCorreta(usuario.getNome()); // Placeholder for calligraphy
+        taskRepository.save(newTask);
 
         emailService.sendWelcomeEmail(usuario);
 
