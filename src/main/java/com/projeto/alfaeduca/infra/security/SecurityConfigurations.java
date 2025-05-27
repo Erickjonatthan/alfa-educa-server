@@ -40,6 +40,10 @@ public class SecurityConfigurations {
             .csrf(csrf -> csrf.disable())
             // Gerenciamento de sessão
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint((request, response, ex) -> {
+                    response.setStatus(401);
+                }))
             // Configuração de autorizações
             .authorizeHttpRequests(auth -> {
                 auth.requestMatchers(HttpMethod.POST, "/cadastro").permitAll();
