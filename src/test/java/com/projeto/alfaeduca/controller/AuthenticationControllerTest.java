@@ -72,8 +72,38 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void deveFalharAutenticacaoComCredenciaisInvalidas() throws Exception {
+    void deveFalharAutenticacaoComEmailInvalido() throws Exception {
+        var authData = new AuthenticationData("emailinexistente@email.com", "senha123");
+        
+        mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(authData)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void deveFalharAutenticacaoComSenhaInvalida() throws Exception {
         var authData = new AuthenticationData("teste@email.com", "senhaerrada");
+        
+        mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(authData)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void deveFalharAutenticacaoComEmailEmBranco() throws Exception {
+        var authData = new AuthenticationData("", "senha123");
+        
+        mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(authData)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void deveFalharAutenticacaoComSenhaEmBranco() throws Exception {
+        var authData = new AuthenticationData("teste@email.com", "");
         
         mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
