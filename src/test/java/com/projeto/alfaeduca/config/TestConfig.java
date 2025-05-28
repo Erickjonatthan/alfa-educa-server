@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import com.projeto.alfaeduca.domain.usuario.email.EmailService;
+import com.projeto.alfaeduca.domain.usuario.email.EmailVerifier;
 
 @Configuration
 @Profile("test")
@@ -16,11 +17,17 @@ public class TestConfig {
     @Primary
     public EmailService emailService() {
         return Mockito.mock(EmailService.class);
+    }    @Bean
+    @Primary
+    public OCR ocr() {
+        return Mockito.mock(OCR.class);
     }
 
     @Bean
     @Primary
-    public OCR ocr() {
-        return Mockito.mock(OCR.class);
+    public EmailVerifier emailVerifier() {
+        EmailVerifier mockVerifier = Mockito.mock(EmailVerifier.class);
+        Mockito.when(mockVerifier.verificaEmail(Mockito.anyString())).thenReturn(true);
+        return mockVerifier;
     }
 }
