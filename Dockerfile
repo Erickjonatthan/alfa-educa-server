@@ -1,21 +1,23 @@
-FROM ubuntu:latest AS build
+FROM maven:3.8-openjdk-17 AS build
 
-RUN apt-get update
-RUN apt-get install -y openjdk-17-jdk tesseract-ocr libtesseract-dev maven
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
 
-COPY . .
-
-RUN mvn clean install
+RUN mvn clean install -DskipTests
 
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-EXPOSE 8081
+RUN apt-get update && \
+    apt-get install -y tesseract-ocr tesseract-ocr-por && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /target/alfaeduca-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/alfaeduca-0.0.1-SNAPSHOT.jar app.jar
 COPY .env .env
 
-RUN apt-get update && apt-get install -y tesseract-ocr libtesseract-dev tesseract-ocr-por
+EXPOSE 8081
 
 ENTRYPOINT ["java","-jar","app.jar"]
