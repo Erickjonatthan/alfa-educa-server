@@ -30,7 +30,7 @@ public class SecurityConfigurations {
             // Configuração CORS modernizada
             .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
                 CorsConfiguration corsConfig = new CorsConfiguration();
-                corsConfig.setAllowedOrigins(List.of("https://alfa-educa-web.onrender.com")); // Frontend autorizado
+                corsConfig.setAllowedOrigins(List.of("https://site.alfaeduca.ejms-api.shop")); // Frontend autorizado
                 corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH")); // Métodos aceitos
                 corsConfig.setAllowedHeaders(List.of("*")); // Cabeçalhos aceitos
                 corsConfig.setAllowCredentials(true); // Permitir cookies/autenticação
