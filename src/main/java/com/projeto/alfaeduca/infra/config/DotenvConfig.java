@@ -38,7 +38,8 @@ public class DotenvConfig {
                 } else {
                     dotenv = Dotenv.configure()
                             .ignoreIfMissing()
-                            .load();                }
+                            .load();
+                }
 
                 return dotenv;
             } catch (Exception e) {
