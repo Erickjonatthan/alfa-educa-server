@@ -6,10 +6,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DotenvConfig {
     static {
-        Dotenv dotenv = Dotenv.configure()
-            .directory("/app")
-            .ignoreIfMissing()
-            .load();
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
+        try {
+            Dotenv dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+
+            dotenv.entries().forEach(entry -> {
+                System.setProperty(entry.getKey(), entry.getValue());
+            });
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar arquivo .env: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

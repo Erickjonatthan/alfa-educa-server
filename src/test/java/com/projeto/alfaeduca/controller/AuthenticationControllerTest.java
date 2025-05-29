@@ -4,7 +4,6 @@ import com.projeto.alfaeduca.domain.usuario.UserAccount;
 import com.projeto.alfaeduca.domain.usuario.UserRegistrationData;
 import com.projeto.alfaeduca.domain.usuario.UserRepository;
 import com.projeto.alfaeduca.domain.usuario.authentication.AuthenticationData;
-import com.projeto.alfaeduca.infra.security.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,6 @@ public class AuthenticationControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TokenService tokenService;
 
     @Autowired
     private ObjectMapper objectMapper;
