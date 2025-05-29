@@ -120,7 +120,8 @@ cd alfa-educa-server
 ### Passo 2: Configure as Variáveis de Ambiente
 Copie o arquivo de exemplo e configure as variáveis:
 ```bash
-copy .env.example .env
+cp ./.env.example ./.env
+nano ./.env
 ```
 Edite o arquivo `.env` com suas configurações específicas (senhas, secrets, etc.)
 
