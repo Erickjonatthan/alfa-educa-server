@@ -80,13 +80,12 @@ FROM openjdk:17-jdk-slim
 
 #### 3. Variáveis de Ambiente Necessárias
 ```env
-TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
-DATABASE_URL=jdbc:postgresql://postgres_alfaeduca:5432/pg_alfaeduca
 DATABASE_USER=seu_usuario
 DATABASE_PASSWORD=sua_senha
 MAIL_PASSWORD=senha_do_email
 JWT_SECRET=seu_jwt_secret
 ADMIN_EMAILS=admin@email.com
+CORS_ORIGIN=http://localhost:8082
 ```
 
 ## 🎥 Vídeo de Instalação
