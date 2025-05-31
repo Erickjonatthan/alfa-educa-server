@@ -84,11 +84,12 @@ public class AchievementController {
 
         // Filtrar conquistas pendentes e calcular progresso
         var conquistasPendentes = conquistas.stream()
-                .filter(conquista -> !conquista.podeSerDesbloqueadaPor(user)) // Apenas as que não podem ser desbloqueadas
+                .filter(conquista -> !conquista.podeSerDesbloqueadaPor(user)) // Apenas as que não podem ser
+                                                                              // desbloqueadas
                 .map(conquista -> {
                     return new AchievementProgressDTO(
                             new AchievementDetailsDTO(conquista), // Detalhes da conquista
-                            conquista.calcularProgresso(user)    // Progresso do usuário
+                            conquista.calcularProgresso(user) // Progresso do usuário
                     );
                 })
                 .collect(Collectors.toList());
@@ -120,7 +121,7 @@ public class AchievementController {
         return ResponseEntity.ok().build();
     }
 
-    //listar as conquistas desbloqueadas de um usuário
+    // listar as conquistas desbloqueadas de um usuário
     @GetMapping("/listar/{userId}")
     public ResponseEntity<List<AchievementDetailsDTO>> listarConquistasDesbloqueadas(@PathVariable UUID userId) {
         if (!SecurityUtils.isUserAccessingOwnResource(userId)) {

@@ -34,7 +34,8 @@ public class TaskController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<TaskDetailsDTO> cadastrar(@RequestBody @Valid TaskRegistrationData dados, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<TaskDetailsDTO> cadastrar(@RequestBody @Valid TaskRegistrationData dados,
+            UriComponentsBuilder uriBuilder) {
         var usuarioAutenticado = SecurityUtils.getAuthenticatedUser();
         if (usuarioAutenticado == null || !usuarioAutenticado.isAdmin()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -48,14 +49,14 @@ public class TaskController {
         return ResponseEntity.created(uri).body(new TaskDetailsDTO(atividade));
     }
 
-    //Listar todas as atividades
+    // Listar todas as atividades
     @GetMapping
     public ResponseEntity<List<TaskDetailsDTO>> listar() {
         var atividades = repository.findAll();
         return ResponseEntity.ok(atividades.stream().map(TaskDetailsDTO::new).collect(Collectors.toList()));
     }
 
-    //Listar atividade pelo id
+    // Listar atividade pelo id
     @GetMapping("/{id}")
     public ResponseEntity<TaskDetailsDTO> detalhar(@PathVariable UUID id) {
         var atividade = repository.findById(id);

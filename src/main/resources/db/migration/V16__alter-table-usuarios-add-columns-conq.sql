@@ -1,9 +1,8 @@
 -- Adicionando colunas à tabela usuarios
-ALTER TABLE usuarios
-ADD COLUMN ultimo_login DATE NULL,
-ADD COLUMN atividades_concluidas INTEGER DEFAULT 0 NOT NULL,
-ADD COLUMN dias_consecutivos INTEGER DEFAULT 0 NOT NULL,
-ADD COLUMN primeira_resposta_correta BOOLEAN DEFAULT FALSE NOT NULL;
+ALTER TABLE usuarios ADD ultimo_login DATE NULL;
+ALTER TABLE usuarios ADD atividades_concluidas INTEGER DEFAULT 0 NOT NULL;
+ALTER TABLE usuarios ADD dias_consecutivos INTEGER DEFAULT 0 NOT NULL;
+ALTER TABLE usuarios ADD primeira_resposta_correta BOOLEAN DEFAULT FALSE NOT NULL;
 
 -- Atualizando valores existentes para garantir consistência
 UPDATE usuarios

@@ -81,25 +81,26 @@ public class AuthenticationController {
         if (user != null) {
             // Gere uma nova senha aleatória
             String novaSenha = generateRandomPassword();
-    
+
             emailService.sendResetPasswordEmail(user, novaSenha);
             user.setSenha(novaSenha, passwordEncoder);
             repository.save(user);
-    
+
             return ResponseEntity.ok(new UserDetailsDTO(user));
         }
-    
+
         return ResponseEntity.notFound().build();
     }
 
-     @PostMapping("/mudar-role/{id}")
+    @PostMapping("/mudar-role/{id}")
     public ResponseEntity<UserDetailsDTO> mudarRole(@PathVariable UUID id) {
         var usuarioAutenticado = SecurityUtils.getAuthenticatedUser();
         if (usuarioAutenticado == null || !usuarioAutenticado.isAdmin()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        var usuario = repository.getReferenceById(id);
-        if (usuario != null) {
+
+        try {
+            var usuario = repository.getReferenceById(id);
             var roles = new ArrayList<>(usuario.getRoles());
             if (roles.contains("ROLE_ADMIN")) {
                 // Se o usuário é admin, remove a role de admin e mantém apenas a de usuário
@@ -110,13 +111,13 @@ public class AuthenticationController {
             }
             usuario.setRoles(roles);
             repository.save(usuario);
-    
+
             return ResponseEntity.ok(new UserDetailsDTO(usuario));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
-    
-        return ResponseEntity.notFound().build();
     }
-    
+
     private String generateRandomPassword() {
         Random random = new Random();
         return String.valueOf(random.nextInt(1000000));

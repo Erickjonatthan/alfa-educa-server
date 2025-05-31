@@ -3,8 +3,6 @@ package com.projeto.alfaeduca.config;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 import java.awt.image.BufferedImage;
 
 import net.sourceforge.tess4j.ITesseract;
@@ -15,13 +13,14 @@ public class OCR {
     private ITesseract tesseract = new Tesseract();
 
     public OCR() {
-        Dotenv dotenv = Dotenv.configure().load();
-        String tessDataPath = dotenv.get("TESSDATA_PREFIX");
-        if (tessDataPath != null) {
-            tesseract.setDatapath(tessDataPath);
-        } else {
-            // Caminho padrão caso a variável de ambiente não esteja definida
+        // Detecta o sistema operacional e define o caminho apropriado do Tesseract
+        String osName = System.getProperty("os.name").toLowerCase();
+        if (osName.contains("windows")) {
+            // Caminho padrão do Tesseract no Windows
             tesseract.setDatapath("C:\\Program Files\\Tesseract-OCR\\tessdata");
+        } else {
+            // Caminho padrão do Tesseract no Linux/Docker
+            tesseract.setDatapath("/usr/share/tesseract-ocr/4.00/tessdata");
         }
         // Define a linguagem para português
         tesseract.setLanguage("por");
