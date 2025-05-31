@@ -42,13 +42,9 @@ O projeto utiliza Docker Compose para orquestrar dois serviços principais:
 
 ### Dockerfile - Análise Detalhada
 
-O Dockerfile utiliza uma abordagem multi-stage build para otimizar o tamanho final da imagem:
+O Dockerfile utiliza uma abordagem para otimizar o tamanho final da imagem:
 
 #### Stage 1 - Build
-```dockerfile
-FROM ubuntu:latest AS build
-```
-- **Base**: Ubuntu latest para compilação
 - **Ferramentas instaladas**:
   - OpenJDK 17
   - Tesseract OCR com suporte ao português
