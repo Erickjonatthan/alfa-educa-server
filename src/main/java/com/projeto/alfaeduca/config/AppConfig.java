@@ -13,11 +13,15 @@ public class AppConfig {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
-    }    @Bean
+    }
+
+    @Bean
     @Profile("!test")
     public OCR ocr() {
         return new OCR();
-    }    @Bean
+    }
+
+    @Bean
     @Profile("!test")
     public EmailVerifier emailVerifier() {
         return new EmailVerifier();
