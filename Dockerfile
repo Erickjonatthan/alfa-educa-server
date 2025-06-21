@@ -8,9 +8,6 @@ COPY .mvn/ .mvn/
 COPY mvnw mvnw
 COPY mvnw.cmd mvnw.cmd
 
-# Configurar variáveis de ambiente para testes
-ENV SPRING_PROFILES_ACTIVE=test
-ENV CORS_ORIGIN=http://localhost:3000
 ENV MAVEN_OPTS="-Dmaven.repo.local=/root/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN"
 
 # Baixar dependências e armazenar em cache
