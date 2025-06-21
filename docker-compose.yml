@@ -11,12 +11,18 @@ services:
       - POSTGRES_DB=pg_alfaeduca
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
   alfaeduca_app:
     container_name: alfaeduca_app
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        MAVEN_OPTS: "-Dmaven.repo.local=/root/.m2/repository"
+    environment:
+      - SPRING_PROFILES_ACTIVE=test
+      - CORS_ORIGIN=http://localhost:3000
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_EMAILS=${ADMIN_EMAILS}
     ports:
       - "8081:8081"
     depends_on:
