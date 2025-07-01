@@ -11,12 +11,13 @@ services:
       - POSTGRES_DB=pg_alfaeduca
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
   alfaeduca_app:
     container_name: alfaeduca_app
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        MAVEN_OPTS: "-Dmaven.repo.local=/root/.m2/repository"
     ports:
       - "8081:8081"
     depends_on:
