@@ -24,6 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -78,6 +79,13 @@ public class UserAccount implements UserDetails {
         if (!this.conquistas.contains(achievement)) {
             this.conquistas.add(achievement);
             achievement.getUsuarios().add(this);
+        }
+    }
+
+    public void removeConquista(Achievement achievement) {
+        if (this.conquistas.contains(achievement)) {
+            this.conquistas.remove(achievement);
+            achievement.getUsuarios().remove(this);
         }
     }
 
@@ -177,6 +185,15 @@ public class UserAccount implements UserDetails {
 
     public void registrarPrimeiraRespostaCorreta() {
         this.primeiraRespostaCorreta = true;
+    }
+
+    @PreRemove
+    private void limparRelacionamentos() {
+        // Limpar relacionamentos com conquistas antes da remoção
+        for (Achievement conquista : new ArrayList<>(this.conquistas)) {
+            this.removeConquista(conquista);
+        }
+        this.conquistas.clear();
     }
 
 }

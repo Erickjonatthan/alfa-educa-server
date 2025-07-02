@@ -74,7 +74,7 @@ public class AchievementController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        var usuario = userRepository.findById(userId);
+        var usuario = userRepository.findByIdWithConquistas(userId);
         if (usuario.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -84,8 +84,8 @@ public class AchievementController {
 
         // Filtrar conquistas pendentes e calcular progresso
         var conquistasPendentes = conquistas.stream()
-                .filter(conquista -> !conquista.podeSerDesbloqueadaPor(user)) // Apenas as que não podem ser
-                                                                              // desbloqueadas
+                .filter(conquista -> !user.getConquistas().contains(conquista)) // Apenas as que o usuário ainda não possui
+                .filter(conquista -> !conquista.podeSerDesbloqueadaPor(user)) // E que ainda não pode desbloquear
                 .map(conquista -> {
                     return new AchievementProgressDTO(
                             new AchievementDetailsDTO(conquista), // Detalhes da conquista
