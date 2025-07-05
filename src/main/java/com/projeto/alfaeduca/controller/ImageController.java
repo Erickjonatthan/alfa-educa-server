@@ -13,22 +13,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.projeto.alfaeduca.config.OCR;
+
+import com.projeto.alfaeduca.service.AIImageTextService;
 import com.projeto.alfaeduca.domain.imagem.SilabaUtils;
 import com.projeto.alfaeduca.domain.imagem.DTO.ImagemDetailsDTO;
-
-import net.sourceforge.tess4j.TesseractException;
 
 @RestController
 @RequestMapping("/extrair-texto")
 public class ImageController {
 
     @Autowired
-    private OCR ocr;
+    private AIImageTextService aiImageTextService;
 
     @PostMapping
-    public ResponseEntity<ImagemDetailsDTO> extrairTexto(@RequestBody Map<String, String> payload)
-            throws TesseractException {
+    public ResponseEntity<ImagemDetailsDTO> extrairTexto(@RequestBody Map<String, String> payload) {
         String base64Image = payload.get("image");
         if (base64Image == null || base64Image.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
@@ -43,10 +41,15 @@ public class ImageController {
 
         String textoExtraido;
         try (InputStream inputStream = new ByteArrayInputStream(imageBytes)) {
-            textoExtraido = ocr.extrairTexto(inputStream);
+            textoExtraido = aiImageTextService.extrairTexto(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+        // Verifica se foi encontrado texto
+        if (textoExtraido == null || textoExtraido.equals("Nenhum texto encontrado")) {
+            return ResponseEntity.ok().body(new ImagemDetailsDTO("", ""));
         }
 
         // Remover completamente as quebras de linha do texto extraído

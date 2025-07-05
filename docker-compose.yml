@@ -3,8 +3,8 @@ services:
   postgres_alfaeduca:
     container_name: postgres_alfaeducadb
     image: postgres
-    expose:
-      - "5432"
+    ports:
+      - "5434:5432"
     environment:
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
