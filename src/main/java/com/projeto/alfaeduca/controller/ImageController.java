@@ -64,7 +64,11 @@ public class ImageController {
         try {
             // Validação da entrada
             if (file == null || file.isEmpty()) {
-                return ResponseEntity.badRequest().body(createErrorResponse("Arquivo não fornecido", "BAD_REQUEST"));
+                Map<String, Object> errorResponse = createErrorResponse(
+                    "Arquivo não fornecido. Certifique-se de enviar o arquivo com o nome 'file' no form-data", 
+                    "FILE_NOT_PROVIDED");
+                errorResponse.put("exemplo", "Use form-data com key='file' e value=seu_arquivo");
+                return ResponseEntity.badRequest().body(errorResponse);
             }
 
             // Validação do tipo de arquivo
