@@ -17,11 +17,8 @@ public class TestConfig {
     @Primary
     public EmailService emailService() {
         return Mockito.mock(EmailService.class);
-    }    @Bean
-    @Primary
-    public OCR ocr() {
-        return Mockito.mock(OCR.class);
-    }
+    }   
+
 
     @Bean
     @Primary

@@ -17,12 +17,6 @@ public class AppConfig {
 
     @Bean
     @Profile("!test")
-    public OCR ocr() {
-        return new OCR();
-    }
-
-    @Bean
-    @Profile("!test")
     public EmailVerifier emailVerifier() {
         return new EmailVerifier();
     }
