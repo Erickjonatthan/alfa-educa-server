@@ -20,7 +20,6 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2/repository mvn clean verify \
     -B \
     -Dspring.profiles.active=test \
-    -DCORS_ORIGIN=http://localhost:3000 \
     -Dmaven.test.failure.ignore=false \
     --no-transfer-progress
 FROM openjdk:17-jdk-slim
