@@ -1,4 +1,4 @@
-FROM maven:3.8-openjdk-17 AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
@@ -7,8 +7,6 @@ COPY pom.xml .
 COPY .mvn/ .mvn/
 COPY mvnw mvnw
 COPY mvnw.cmd mvnw.cmd
-
-ENV MAVEN_OPTS="-Dmaven.repo.local=/root/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN"
 
 # Baixar dependências e armazenar em cache
 RUN --mount=type=cache,target=/root/.m2/repository mvn dependency:go-offline -B
@@ -22,13 +20,10 @@ RUN --mount=type=cache,target=/root/.m2/repository mvn clean verify \
     -Dspring.profiles.active=test \
     -Dmaven.test.failure.ignore=false \
     --no-transfer-progress
-FROM openjdk:17-jdk-slim
+
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
-
-RUN apt-get update && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/target/alfaeduca-0.0.1-SNAPSHOT.jar app.jar
 COPY .env .env

@@ -1,9 +1,10 @@
 package com.projeto.alfaeduca.config;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.client.RestTemplate;
 
 import com.projeto.alfaeduca.domain.usuario.email.EmailVerifier;
 
@@ -11,14 +12,15 @@ import com.projeto.alfaeduca.domain.usuario.email.EmailVerifier;
 public class AppConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    @Profile("!test")
+    public EmailVerifier emailVerifier() {
+        return new EmailVerifier();
     }
 
     @Bean
     @Profile("!test")
-    public EmailVerifier emailVerifier() {
-        return new EmailVerifier();
+    public ChatClient chatClient(ChatModel chatModel) {
+        return ChatClient.builder(chatModel).build();
     }
 
 }

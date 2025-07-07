@@ -3,8 +3,9 @@ package com.projeto.alfaeduca.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.projeto.alfaeduca.service.AIImageTextService;
 import com.projeto.alfaeduca.domain.imagem.SilabaUtils;
 import com.projeto.alfaeduca.domain.imagem.DTO.ImagemDetailsDTO;
+import com.projeto.alfaeduca.infra.exception.ErrorResponseUtil;
 
 @RestController
 @RequestMapping("/extrair-texto")
@@ -36,7 +38,7 @@ public class ImageController {
             // Validação da entrada
             String base64Image = payload.get("image");
             if (base64Image == null || base64Image.isEmpty()) {
-                return ResponseEntity.badRequest().body(createErrorResponse("Imagem não fornecida", "BAD_REQUEST"));
+                return ResponseEntity.badRequest().body(ErrorResponseUtil.createErrorResponse("Imagem não fornecida", "BAD_REQUEST"));
             }
 
             // Validação do Base64
@@ -44,7 +46,7 @@ public class ImageController {
             try {
                 imageBytes = Base64.getDecoder().decode(base64Image);
             } catch (IllegalArgumentException e) {
-                return ResponseEntity.badRequest().body(createErrorResponse("Formato Base64 inválido", "INVALID_BASE64"));
+                return ResponseEntity.badRequest().body(ErrorResponseUtil.createErrorResponse("Formato Base64 inválido", "INVALID_BASE64"));
             }
 
             return processarImagem(imageBytes);
@@ -55,7 +57,7 @@ public class ImageController {
             e.printStackTrace();
             
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(createErrorResponse("Erro inesperado no servidor", "UNEXPECTED_ERROR"));
+                .body(ErrorResponseUtil.createErrorResponse("Erro inesperado no servidor", "UNEXPECTED_ERROR"));
         }
     }
 
@@ -64,7 +66,7 @@ public class ImageController {
         try {
             // Validação da entrada
             if (file == null || file.isEmpty()) {
-                Map<String, Object> errorResponse = createErrorResponse(
+                Map<String, Object> errorResponse = ErrorResponseUtil.createErrorResponse(
                     "Arquivo não fornecido. Certifique-se de enviar o arquivo com o nome 'file' no form-data", 
                     "FILE_NOT_PROVIDED");
                 errorResponse.put("exemplo", "Use form-data com key='file' e value=seu_arquivo");
@@ -74,12 +76,12 @@ public class ImageController {
             // Validação do tipo de arquivo
             String contentType = file.getContentType();
             if (contentType == null || !contentType.startsWith("image/")) {
-                return ResponseEntity.badRequest().body(createErrorResponse("Tipo de arquivo inválido. Apenas imagens são aceitas", "INVALID_FILE_TYPE"));
+                return ResponseEntity.badRequest().body(ErrorResponseUtil.createErrorResponse("Tipo de arquivo inválido. Apenas imagens são aceitas", "INVALID_FILE_TYPE"));
             }
 
             // Validação do tamanho
             if (file.getSize() > 20 * 1024 * 1024) { // 20MB
-                return ResponseEntity.badRequest().body(createErrorResponse("Arquivo muito grande. Máximo: 20MB", "FILE_TOO_LARGE"));
+                return ResponseEntity.badRequest().body(ErrorResponseUtil.createErrorResponse("Arquivo muito grande. Máximo: 20MB", "FILE_TOO_LARGE"));
             }
 
             byte[] imageBytes = file.getBytes();
@@ -89,7 +91,7 @@ public class ImageController {
             System.err.println("Erro ao ler arquivo: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(createErrorResponse("Erro ao ler arquivo", "FILE_READ_ERROR"));
+                .body(ErrorResponseUtil.createErrorResponse("Erro ao ler arquivo", "FILE_READ_ERROR"));
                 
         } catch (Exception e) {
             // Último recurso para capturar qualquer erro não tratado
@@ -97,7 +99,7 @@ public class ImageController {
             e.printStackTrace();
             
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(createErrorResponse("Erro inesperado no servidor", "UNEXPECTED_ERROR"));
+                .body(ErrorResponseUtil.createErrorResponse("Erro inesperado no servidor", "UNEXPECTED_ERROR"));
         }
     }
     /**
@@ -107,7 +109,7 @@ public class ImageController {
         try {
             // Validação do tamanho
             if (imageBytes.length > 20 * 1024 * 1024) { // 20MB
-                return ResponseEntity.badRequest().body(createErrorResponse("Imagem muito grande. Máximo: 20MB", "IMAGE_TOO_LARGE"));
+                return ResponseEntity.badRequest().body(ErrorResponseUtil.createErrorResponse("Imagem muito grande. Máximo: 20MB", "IMAGE_TOO_LARGE"));
             }
 
             String textoExtraido;
@@ -119,7 +121,7 @@ public class ImageController {
                 e.printStackTrace();
                 
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createErrorResponse("Erro ao processar imagem com IA: " + e.getMessage(), "AI_PROCESSING_ERROR"));
+                    .body(ErrorResponseUtil.createErrorResponse("Erro ao processar imagem com IA: " + e.getMessage(), "AI_PROCESSING_ERROR"));
                     
             } catch (Exception e) {
                 // Outros erros
@@ -127,22 +129,40 @@ public class ImageController {
                 e.printStackTrace();
                 
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(createErrorResponse("Erro interno do servidor", "INTERNAL_ERROR"));
+                    .body(ErrorResponseUtil.createErrorResponse("Erro interno do servidor", "INTERNAL_ERROR"));
             }
 
             // Verifica se foi encontrado texto
             if (textoExtraido == null || textoExtraido.equals("Nenhum texto encontrado") || 
                 textoExtraido.contains("NENHUM_TEXTO_ENCONTRADO")) {
-                return ResponseEntity.ok().body(new ImagemDetailsDTO("", ""));
+                return ResponseEntity.ok().body(new ImagemDetailsDTO("", "", new ArrayList<>(), new ArrayList<>(), 0));
             }
 
             // Remover completamente as quebras de linha do texto extraído
             textoExtraido = textoExtraido.replace("\n", "").replace("\r", "");
 
-            List<String> silabas = SilabaUtils.separarSilabas(textoExtraido);
-            String textoSilabado = String.join("-", silabas);
+            // Separar o texto em palavras individuais
+            List<String> palavras = Arrays.asList(textoExtraido.trim().split("\\s+"));
+            
+            // Processar cada palavra individualmente para obter as sílabas
+            List<String> palavrasSilabas = new ArrayList<>();
+            for (String palavra : palavras) {
+                List<String> silabas = SilabaUtils.separarSilabas(palavra);
+                String palavraSilabada = String.join("-", silabas);
+                palavrasSilabas.add(palavraSilabada);
+            }
+            
+            // Manter o comportamento original para compatibilidade
+            List<String> todasSilabas = SilabaUtils.separarSilabas(textoExtraido);
+            String textoSilabado = String.join("-", todasSilabas);
 
-            ImagemDetailsDTO imagemDetailsDTO = new ImagemDetailsDTO(textoExtraido, textoSilabado);
+            ImagemDetailsDTO imagemDetailsDTO = new ImagemDetailsDTO(
+                textoExtraido, 
+                textoSilabado, 
+                palavras, 
+                palavrasSilabas, 
+                palavras.size()
+            );
             return ResponseEntity.ok().body(imagemDetailsDTO);
             
         } catch (Exception e) {
@@ -150,16 +170,7 @@ public class ImageController {
             e.printStackTrace();
             
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(createErrorResponse("Erro ao processar imagem", "IMAGE_PROCESSING_ERROR"));
+                .body(ErrorResponseUtil.createErrorResponse("Erro ao processar imagem", "IMAGE_PROCESSING_ERROR"));
         }
-    }
-    
-    private Map<String, Object> createErrorResponse(String message, String errorType) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("erro", message);
-        errorResponse.put("tipoErro", errorType);
-        errorResponse.put("sucesso", false);
-        errorResponse.put("timestamp", System.currentTimeMillis());
-        return errorResponse;
     }
 }
