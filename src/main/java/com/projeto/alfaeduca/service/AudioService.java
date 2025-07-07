@@ -29,7 +29,7 @@ public class AudioService {
 
             var response = chatClient.prompt(new Prompt(List.of(userMessage),
                     OpenAiChatOptions.builder()
-                        .model(OpenAiApi.ChatModel.GPT_4_O_AUDIO_PREVIEW)
+                        .model(OpenAiApi.ChatModel.GPT_4_O_MINI_AUDIO_PREVIEW)
                         .outputModalities(List.of("text", "audio"))
                         .outputAudio(new AudioParameters(Voice.ALLOY, AudioResponseFormat.WAV)) // Voz mais suave
                         .build()))
@@ -64,7 +64,7 @@ public class AudioService {
 
             var response = chatClient.prompt(new Prompt(List.of(userMessage),
                     OpenAiChatOptions.builder()
-                        .model(OpenAiApi.ChatModel.GPT_4_O_AUDIO_PREVIEW)
+                        .model(OpenAiApi.ChatModel.GPT_4_O_MINI_AUDIO_PREVIEW)
                         .outputModalities(List.of("text", "audio"))
                         .outputAudio(new AudioParameters(Voice.NOVA, AudioResponseFormat.WAV)) // Voz mais suave
                         .build()))
@@ -95,7 +95,7 @@ public class AudioService {
 
                 var response = chatClient.prompt(new Prompt(List.of(userMessage),
                         OpenAiChatOptions.builder()
-                            .model(OpenAiApi.ChatModel.GPT_4_O_AUDIO_PREVIEW)
+                            .model(OpenAiApi.ChatModel.GPT_4_O_MINI_AUDIO_PREVIEW)
                             .outputModalities(List.of("text", "audio"))
                             .outputAudio(new AudioParameters(Voice.ALLOY, AudioResponseFormat.WAV))
                             .build()))
@@ -134,7 +134,7 @@ public class AudioService {
 
                 var response = chatClient.prompt(new Prompt(List.of(userMessage),
                         OpenAiChatOptions.builder()
-                            .model(OpenAiApi.ChatModel.GPT_4_O_AUDIO_PREVIEW)
+                            .model(OpenAiApi.ChatModel.GPT_4_O_MINI_AUDIO_PREVIEW)
                             .outputModalities(List.of("text", "audio"))
                             .outputAudio(new AudioParameters(Voice.NOVA, AudioResponseFormat.WAV))
                             .build()))
