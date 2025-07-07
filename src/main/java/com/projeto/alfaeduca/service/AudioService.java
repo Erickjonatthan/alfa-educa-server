@@ -24,13 +24,12 @@ public class AudioService {
     public byte[] gerarAudioTextoNormal(String texto) {
         try {
 
-            String instrucao = "Repita o seguinte texto de forma clara e natural. Apenas repita o texto, não converse, nem fale nada mais do que isso. ESTE É O TEXTO: "
-                    + texto;
+            String instrucao = "Repita o seguinte texto de forma clara e natural. Apenas repita o texto, não converse, nem fale nada mais do que isso. ESTE É O TEXTO: "+ texto;
             var userMessage = new UserMessage(instrucao);
 
             var response = chatClient.prompt(new Prompt(List.of(userMessage),
                     OpenAiChatOptions.builder()
-                            .model(OpenAiApi.ChatModel.GPT_4_O_MINI_AUDIO_PREVIEW)
+                            .model(OpenAiApi.ChatModel.GPT_4_O_AUDIO_PREVIEW)
                             .outputModalities(List.of("text", "audio"))
                             .outputAudio(new AudioParameters(Voice.ALLOY, AudioResponseFormat.WAV)) // Voz mais suave
                             .build()))
@@ -64,17 +63,13 @@ public class AudioService {
                     "Finja que você o um mascote que fala tudo separado por sílabas.\n" +
                     "Você só sabe responder o texto por sílabas.\n" +
                     "Todo texto que você receber, você deve ler separando as sílabas.\n" +
-                    "Não tenha medo da letra s, pois você sabe o som de todas as palvras no PT-BR \n"+
-                    "- Não gere um áudio longo, seus audios não devem ultrapassar 10 segundos.";
-
-
-            System.out.println("Texto silabado para áudio: " + instrucao);
+                    "Não tenha medo da letra s, pois você sabe o som de todas as palvras no PT-BR \n";
 
             var userMessage = new UserMessage(instrucao);
 
             var response = chatClient.prompt(new Prompt(List.of(userMessage),
                     OpenAiChatOptions.builder()
-                            .model(OpenAiApi.ChatModel.GPT_4_O_MINI_AUDIO_PREVIEW)
+                            .model(OpenAiApi.ChatModel.GPT_4_O_AUDIO_PREVIEW)
                             .outputModalities(List.of("text", "audio"))
                             .outputAudio(new AudioParameters(Voice.NOVA, AudioResponseFormat.WAV)) // Voz mais suave
                             .build()))
