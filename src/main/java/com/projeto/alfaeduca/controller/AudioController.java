@@ -1,7 +1,5 @@
 package com.projeto.alfaeduca.controller;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,64 +67,6 @@ public class AudioController {
             
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponseUtil.createErrorResponse("Erro ao gerar áudio silabado", "AUDIO_GENERATION_ERROR"));
-        }
-    }
-
-    @PostMapping("/palavras-individuais")
-    public ResponseEntity<?> gerarAudioPalavrasIndividuais(@RequestBody ImagemDetailsDTO imagemDetails) {
-        try {
-            // Validação da entrada
-            if (imagemDetails == null || imagemDetails.palavras() == null || imagemDetails.palavras().isEmpty()) {
-                return ResponseEntity.badRequest().body(ErrorResponseUtil.createErrorResponse("Lista de palavras não fornecida", "BAD_REQUEST"));
-            }
-
-            List<byte[]> audiosBytes = audioService.gerarAudioPalavrasIndividuais(imagemDetails.palavras());
-            
-            // Retorna uma resposta JSON com os áudios em base64
-            Map<String, Object> response = new HashMap<>();
-            response.put("sucesso", true);
-            response.put("quantidadeAudios", audiosBytes.size());
-            response.put("audios", audiosBytes.stream()
-                .map(java.util.Base64.getEncoder()::encodeToString)
-                .toList());
-            
-            return ResponseEntity.ok().body(response);
-            
-        } catch (Exception e) {
-            System.err.println("Erro ao gerar áudios das palavras individuais: " + e.getMessage());
-            e.printStackTrace();
-            
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponseUtil.createErrorResponse("Erro ao gerar áudios das palavras", "AUDIO_GENERATION_ERROR"));
-        }
-    }
-
-    @PostMapping("/palavras-silabadas")
-    public ResponseEntity<?> gerarAudioPalavrasSilabadas(@RequestBody ImagemDetailsDTO imagemDetails) {
-        try {
-            // Validação da entrada
-            if (imagemDetails == null || imagemDetails.palavrasSilabas() == null || imagemDetails.palavrasSilabas().isEmpty()) {
-                return ResponseEntity.badRequest().body(ErrorResponseUtil.createErrorResponse("Lista de palavras silabadas não fornecida", "BAD_REQUEST"));
-            }
-
-            List<byte[]> audiosBytes = audioService.gerarAudioPalavrasSilabadas(imagemDetails.palavrasSilabas());
-            
-            // Retorna uma resposta JSON com os áudios em base64
-            Map<String, Object> response = new HashMap<>();
-            response.put("sucesso", true);
-            response.put("quantidadeAudios", audiosBytes.size());
-            response.put("audios", audiosBytes.stream()
-                .map(java.util.Base64.getEncoder()::encodeToString)
-                .toList());
-            
-            return ResponseEntity.ok().body(response);
-            
-        } catch (Exception e) {
-            System.err.println("Erro ao gerar áudios das palavras silabadas: " + e.getMessage());
-            e.printStackTrace();
-            
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponseUtil.createErrorResponse("Erro ao gerar áudios das palavras silabadas", "AUDIO_GENERATION_ERROR"));
         }
     }
 
