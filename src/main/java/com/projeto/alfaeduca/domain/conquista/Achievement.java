@@ -71,22 +71,28 @@ public class Achievement {
 
     // Método para verificar se a conquista pode ser desbloqueada por um usuário
     public boolean podeSerDesbloqueadaPor(UserAccount user) {
-        if (this.nivelRequerido != null && user.getNivel() >= this.nivelRequerido) {
-            return true;
+        // Verifica se o usuário já possui esta conquista
+        if (user.getConquistas().contains(this)) {
+            return false;
         }
-        if (this.pontosRequeridos != null && user.getPontos() >= this.pontosRequeridos) {
-            return true;
+        
+        // Verifica todos os critérios necessários
+        if (this.nivelRequerido != null && user.getNivel() < this.nivelRequerido) {
+            return false;
         }
-        if (this.atividadesRequeridas != null && user.getAtividadesConcluidas() >= this.atividadesRequeridas) {
-            return true;
+        if (this.pontosRequeridos != null && user.getPontos() < this.pontosRequeridos) {
+            return false;
         }
-        if (this.primeiraRespostaCorreta != null && this.primeiraRespostaCorreta && user.isPrimeiraRespostaCorreta()) {
-            return true;
+        if (this.atividadesRequeridas != null && user.getAtividadesConcluidas() < this.atividadesRequeridas) {
+            return false;
         }
-        if (this.diasConsecutivosRequeridos != null && user.getDiasConsecutivos() >= this.diasConsecutivosRequeridos) {
-            return true;
+        if (this.primeiraRespostaCorreta != null && this.primeiraRespostaCorreta && !user.isPrimeiraRespostaCorreta()) {
+            return false;
         }
-        return false;
+        if (this.diasConsecutivosRequeridos != null && user.getDiasConsecutivos() < this.diasConsecutivosRequeridos) {
+            return false;
+        }
+        return true;
     }
 
     public String calcularProgresso(UserAccount user) {
@@ -106,5 +112,12 @@ public class Achievement {
             return "Faltam " + (this.diasConsecutivosRequeridos - user.getDiasConsecutivos()) + " dias consecutivos de login para desbloquear.";
         }
         return "Conquista desbloqueada ou sem progresso necessário.";
+    }
+
+    public void removeUsuario(UserAccount user) {
+        if (this.usuarios.contains(user)) {
+            this.usuarios.remove(user);
+            user.getConquistas().remove(this);
+        }
     }
 }

@@ -1,0 +1,29 @@
+FROM ubuntu:22.04
+
+# Instalar dependências necessárias
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar Ollama
+RUN curl -fsSL https://ollama.ai/install.sh | sh
+
+# Criar diretório para modelos
+RUN mkdir -p /root/.ollama/models
+
+# Script para baixar modelo do Google Drive
+COPY download_model.sh /usr/local/bin/download_model.sh
+RUN chmod +x /usr/local/bin/download_model.sh
+
+# Expor porta do Ollama
+EXPOSE 11434
+
+# Script de inicialização
+COPY start_ollama.sh /usr/local/bin/start_ollama.sh
+RUN chmod +x /usr/local/bin/start_ollama.sh
+
+CMD ["/usr/local/bin/start_ollama.sh"]

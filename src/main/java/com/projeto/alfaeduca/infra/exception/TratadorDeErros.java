@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -87,6 +88,30 @@ public class TratadorDeErros {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<String> tratarErroViolacaoIntegridadeDados(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Violação de integridade de dados: " + ex.getMessage());
+    }
+
+    /**
+     * Tratamento específico para quando o parâmetro 'file' não é fornecido
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Object> tratarParametroAusente(MissingServletRequestParameterException ex) {
+        String name = ex.getParameterName();
+        if ("file".equals(name)) {
+            var errorResponse = new java.util.HashMap<String, Object>();
+            errorResponse.put("erro", "Parâmetro 'file' é obrigatório. Certifique-se de enviar o arquivo com o nome 'file' no form-data");
+            errorResponse.put("tipoErro", "MISSING_FILE_PARAMETER");
+            errorResponse.put("sucesso", false);
+            errorResponse.put("timestamp", System.currentTimeMillis());
+            errorResponse.put("exemplo", "Use form-data com key='file' e value=seu_arquivo");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+        
+        var errorResponse = new java.util.HashMap<String, Object>();
+        errorResponse.put("erro", "Parâmetro obrigatório ausente: " + name);
+        errorResponse.put("tipoErro", "MISSING_PARAMETER");
+        errorResponse.put("sucesso", false);
+        errorResponse.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     private record DadosErroValidacao(String campo, String mensagem) {

@@ -1,6 +1,7 @@
 package com.projeto.alfaeduca.config;
 
 import org.mockito.Mockito;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,10 +18,12 @@ public class TestConfig {
     @Primary
     public EmailService emailService() {
         return Mockito.mock(EmailService.class);
-    }    @Bean
+    }   
+
+    @Bean
     @Primary
-    public OCR ocr() {
-        return Mockito.mock(OCR.class);
+    public ChatClient chatClient() {
+        return Mockito.mock(ChatClient.class);
     }
 
     @Bean
