@@ -260,7 +260,7 @@ docker-compose logs postgres_alfaeduca
 ```bash
 docker-compose build --no-cache alfaeduca_app
 docker-compose down --rmi all --volumes && docker-compose build --no-cache && docker-compose up --build```
-
+```
 ## 📊 Tecnologias Utilizadas
 
 ### Backend
