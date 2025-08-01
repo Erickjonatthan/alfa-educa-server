@@ -27,5 +27,24 @@ services:
     environment:
       - OLLAMA_HOST=http://ollama_service:11434
 
+  ollama_service:
+    container_name: ollama_llm
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    ports:
+      - "11434:11434"
+    environment:
+      # ID do arquivo no Google Drive (extrair da URL de compartilhamento)
+      - GDRIVE_FILE_ID=${GDRIVE_FILE_ID}
+      # Nome do arquivo do modelo
+      - MODEL_NAME=${MODEL_NAME}
+      # Modelo padrão para baixar do repositório Ollama (opcional)
+      - DEFAULT_MODEL=${DEFAULT_MODEL}
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+  ollama_data:
