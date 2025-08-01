@@ -23,7 +23,6 @@ services:
       - "8081:8081"
     depends_on:
       - postgres_alfaeduca
-      - ollama_service
     environment:
       - OLLAMA_HOST=http://ollama_service:11434
 
