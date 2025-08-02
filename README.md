@@ -228,7 +228,7 @@ Edite o arquivo `.env` com suas configurações específicas (senhas, secrets, e
 
 ### Passo 3: Execute o Docker Compose
 ```bash
-docker-compose down --rmi all --volumes && docker-compose build --no-cache && docker-compose up --build```
+docker-compose up --build -d
 
 ### Passo 4: Verifique os Containers
 ```bash
@@ -259,7 +259,7 @@ docker-compose logs postgres_alfaeduca
 #### Rebuild da aplicação
 ```bash
 docker-compose build --no-cache alfaeduca_app
-docker-compose down --rmi all --volumes && docker-compose build --no-cache && docker-compose up --build```
+docker-compose up --build -d
 ```
 ## 📊 Tecnologias Utilizadas
 
@@ -311,7 +311,7 @@ Este projeto foi configurado para funcionar **OUT OF THE BOX** com o mínimo de 
 
 1. Clonar o repositório
 2. Criar o arquivo `.env` com as variáveis necessárias
-3. Executar `docker-compose up --build`
+3. Executar `docker-compose up --build -d`
 
 ### Adaptações Mínimas
 - ✅ Variáveis de ambiente centralizadas no arquivo `.env`
