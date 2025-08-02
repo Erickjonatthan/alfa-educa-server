@@ -320,6 +320,11 @@ Este projeto foi configurado para funcionar **OUT OF THE BOX** com o mínimo de 
 - ✅ Dependencies configuradas no docker-compose
 - ✅ Build automático da aplicação
 
+## 🔗 Referências de Modelos e Colab
+
+- **Download do modelo:** [Google Drive](https://drive.google.com/open?id=10W_goUe2xux2OZXLZTDvdgPez8n3Lebg&usp=drive_fs)
+- **Notebook Colab:** [Google Colab](https://colab.research.google.com/drive/1KcsdS-A4JrHIYpt4FTLMCYuWkuXwn8Em)
+
 ## 📞 Contato e Suporte
 
 Para dúvidas sobre a configuração Docker ou problemas na instalação, entre em contato com a equipe responsável.
