@@ -1,30 +1,8 @@
-
 services:
-  postgres_alfaeduca:
-    container_name: postgres_alfaeducadb
-    image: postgres
-    ports:
-      - "5434:5432"
-    environment:
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=pg_alfaeduca
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   alfaeduca_app:
     container_name: alfaeduca_app
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        MAVEN_OPTS: "-Dmaven.repo.local=/root/.m2/repository"
     ports:
       - "8081:8081"
-    depends_on:
-      - postgres_alfaeduca
-    environment:
-      - OLLAMA_HOST=http://ollama_service:11434
-
-volumes:
-  postgres_data:
