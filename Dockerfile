@@ -13,14 +13,9 @@ RUN --mount=type=cache,target=/root/.m2/repository mvn dependency:go-offline -B
 
 # Copiar o código fonte
 COPY src ./src
-
+COPY .env .env
 # Executar testes e build
-RUN --mount=type=cache,target=/root/.m2/repository mvn clean verify \
-    -B \
-    -Dspring.profiles.active=test \
-    -Dmaven.test.failure.ignore=false \
-    --no-transfer-progress
-
+RUN --mount=type=cache,target=/root/.m2/repository mvn clean verify
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
