@@ -229,6 +229,7 @@ Edite o arquivo `.env` com suas configurações específicas (senhas, secrets, e
 ### Passo 3: Execute o Docker Compose
 ```bash
 docker-compose up --build -d
+```
 
 ### Passo 4: Verifique os Containers
 ```bash
